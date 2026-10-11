@@ -1,697 +1,503 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#030817">
-<title>RADHA AI</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#030817">
 
-<style>
-:root {
-  --text: #f2f6ff;
-  --muted: #a9bee0;
-  --blue: #347cff;
-  --gold: #f4d39a;
-  --line: rgba(117,165,255,.35);
-  --glass: rgba(3,12,31,.43);
-  --input: rgba(3,13,34,.72);
-}
-* { box-sizing: border-box; }
-html, body { margin:0; width:100%; height:100%; }
-body {
-  font-family: Arial, sans-serif;
-  color:var(--text);
-  background:#030817;
-  overflow:hidden;
-}
-button, input { font:inherit; }
-button { color:inherit; cursor:pointer; }
-button:focus-visible, input:focus-visible {
-  outline:2px solid #8fc0ff;
-  outline-offset:3px;
-}
+  <title>RADHA AI</title>
 
-/* Existing palace background image */
-.scene {
-  position:fixed;
-  inset:0;
-  z-index:-2;
-  background:
-    linear-gradient(rgba(2,7,21,.12),rgba(2,7,21,.18)),
-    url("./radha-bg.png") center center / cover no-repeat;
-}
-.scene:after {
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(1,7,22,.12);
-}
-
-/* Full-screen app */
-.app {
-  width:100%;
-  height:100vh;
-  height:100dvh;
-  display:flex;
-  flex-direction:column;
-  position:relative;
-  isolation:isolate;
-}
-
-/* Top bar */
-.topbar {
-  min-height:76px;
-  padding:10px 16px;
-  display:flex;
-  align-items:center;
-  gap:13px;
-  border-bottom:1px solid var(--line);
-  background:rgba(2,9,25,.58);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-}
-.icon-btn {
-  width:46px;
-  height:46px;
-  flex-shrink:0;
-  display:grid;
-  place-items:center;
-  border:1px solid var(--line);
-  border-radius:15px;
-  background:rgba(8,24,52,.7);
-  color:#a9ccff;
-  font-size:27px;
-}
-.icon-btn:hover { background:rgba(36,79,145,.65); }
-.brand { flex:1; min-width:0; }
-.brand-name {
-  font-family:Georgia,serif;
-  font-size:29px;
-  letter-spacing:2px;
-  color:var(--gold);
-  line-height:1.15;
-}
-.brand-sub {
-  margin-top:5px;
-  font-size:13px;
-  color:#e0e9fa;
-}
-.online {
-  display:inline-block;
-  width:8px;
-  height:8px;
-  background:#54e4a1;
-  border-radius:50%;
-  box-shadow:0 0 10px #54e4a1;
-  margin-right:5px;
-}
-
-/* Messages occupy all available space */
-.chat {
-  flex:1;
-  min-height:0;
-  overflow-y:auto;
-  padding:22px clamp(14px,4vw,48px);
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  scroll-behavior:smooth;
-  overscroll-behavior:contain;
-  scrollbar-width:thin;
-  scrollbar-color:#456da8 transparent;
-}
-.day {
-  align-self:center;
-  padding:7px 14px;
-  font-size:11px;
-  color:#e2ebff;
-  border:1px solid rgba(128,170,240,.25);
-  background:rgba(5,18,43,.5);
-  border-radius:30px;
-}
-.msg {
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  max-width:min(82%,720px);
-  gap:6px;
-}
-.msg.user {
-  align-self:flex-end;
-  align-items:flex-end;
-}
-.who {
-  font-size:12px;
-  color:#bdd4ff;
-  padding:0 5px;
-}
-.bubble {
-  padding:13px 17px;
-  border:1px solid rgba(129,170,235,.3);
-  background:rgba(5,20,44,.74);
-  backdrop-filter:blur(9px);
-  -webkit-backdrop-filter:blur(9px);
-  border-radius:18px 18px 18px 5px;
-  font-size:15px;
-  line-height:1.65;
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-  box-shadow:0 4px 18px rgba(0,0,0,.1);
-}
-.user .bubble {
-  background:rgba(22,74,190,.88);
-  border-color:rgba(128,176,255,.6);
-  border-radius:18px 18px 5px 18px;
-}
-.time {
-  font-size:10px;
-  color:#c0cfea;
-  padding:0 5px;
-}
-
-/* Typing indicator */
-.typing {
-  display:none;
-  align-items:center;
-  gap:9px;
-  padding:0 22px 12px;
-  color:#d1def5;
-  font-size:12px;
-}
-.typing.show { display:flex; }
-.dots { display:flex; gap:4px; }
-.dots span {
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  background:#79b5ff;
-  animation:blink .65s infinite alternate;
-}
-.dots span:nth-child(2) { animation-delay:.2s; }
-.dots span:nth-child(3) { animation-delay:.4s; }
-@keyframes blink { to { opacity:.25; transform:translateY(-3px); } }
-
-/* Bottom message composer */
-.composer-wrap {
-  padding:12px 16px max(13px, env(safe-area-inset-bottom));
-  border-top:1px solid rgba(117,165,255,.23);
-  background:rgba(2,8,24,.46);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-}
-.composer {
-  width:100%;
-  max-width:1100px;
-  margin:auto;
-  display:flex;
-  align-items:center;
-  gap:7px;
-  border:1px solid rgba(107,157,255,.8);
-  background:var(--input);
-  border-radius:40px;
-  padding:6px 7px 6px 12px;
-  box-shadow:0 0 20px rgba(39,104,255,.12);
-}
-.composer input {
-  flex:1;
-  min-width:0;
-  padding:12px 3px;
-  border:0;
-  outline:0;
-  color:white;
-  background:transparent;
-  font-size:15px;
-}
-.composer input::placeholder { color:#a8bbdb; }
-.tool {
-  flex-shrink:0;
-  width:38px;
-  height:38px;
-  border:0;
-  border-radius:50%;
-  background:transparent;
-  color:#a8ccff;
-  font-size:23px;
-}
-.send {
-  width:47px;
-  height:47px;
-  flex-shrink:0;
-  border:1px solid #9bc1ff;
-  border-radius:50%;
-  background:linear-gradient(140deg,#4b91ff,#1450e5);
-  font-size:23px;
-  box-shadow:0 0 18px rgba(43,111,255,.4);
-}
-
-/* Side drawer: opened by + */
-.scrim {
-  position:fixed;
-  inset:0;
-  z-index:5;
-  background:rgba(0,3,12,.58);
-  opacity:0;
-  visibility:hidden;
-  transition:.22s;
-}
-.scrim.open { opacity:1; visibility:visible; }
-.drawer {
-  position:fixed;
-  z-index:6;
-  top:0;
-  bottom:0;
-  left:0;
-  width:min(340px,86vw);
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  gap:13px;
-  background:rgba(3,12,31,.96);
-  border-right:1px solid var(--line);
-  box-shadow:12px 0 40px rgba(0,0,0,.3);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  transform:translateX(-105%);
-  transition:transform .24s ease;
-}
-.drawer.open { transform:translateX(0); }
-.drawer-head {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding-bottom:12px;
-  border-bottom:1px solid var(--line);
-}
-.drawer-title {
-  font:25px Georgia,serif;
-  color:var(--gold);
-}
-.close-btn {
-  width:38px;
-  height:38px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:#0a1a35;
-  font-size:22px;
-}
-.new-chat {
-  padding:13px;
-  border:1px solid rgba(121,169,255,.55);
-  border-radius:13px;
-  background:linear-gradient(110deg,#286cff,#123a9a);
-  text-align:left;
-}
-.section-label {
-  font-size:11px;
-  color:#a9bee0;
-  letter-spacing:1.4px;
-  margin-top:8px;
-}
-.history {
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  overflow-y:auto;
-  min-height:0;
-}
-.history-item {
-  width:100%;
-  padding:12px 10px;
-  display:flex;
-  gap:10px;
-  align-items:center;
-  border:1px solid transparent;
-  border-radius:12px;
-  background:transparent;
-  text-align:left;
-  color:#e2eaff;
-}
-.history-item:hover,
-.history-item.active {
-  background:rgba(31,70,130,.48);
-  border-color:rgba(117,165,255,.28);
-}
-.history-icon { color:#a8ccff; }
-.history-text {
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  font-size:13px;
-}
-.empty-history {
-  padding:12px 4px;
-  font-size:13px;
-  color:#9eb4d8;
-  line-height:1.6;
-}
-.drawer-note {
-  margin-top:auto;
-  color:#a9bee0;
-  font-size:11px;
-  text-align:center;
-  padding-top:12px;
-  border-top:1px solid var(--line);
-}
-.toast {
-  position:fixed;
-  z-index:10;
-  bottom:100px;
-  left:50%;
-  transform:translateX(-50%);
-  display:none;
-  max-width:90vw;
-  padding:11px 15px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:#071a38;
-  font-size:13px;
-}
-.toast.show { display:block; }
-
-/* Optional light theme */
-body.light {
-  --text:#17223a;
-  --muted:#425776;
-  --line:rgba(56,91,150,.4);
-  --glass:rgba(232,240,255,.7);
-  --input:rgba(238,245,255,.86);
-}
-body.light .topbar,
-body.light .composer-wrap { background:rgba(232,240,255,.72); }
-body.light .brand-sub,
-body.light .composer input { color:#14233e; }
-body.light .bubble { color:#f5f7ff; }
-body.light .user .bubble { color:white; }
-body.light .composer input::placeholder { color:#586d8d; }
-
-@media (max-width:600px) {
-  .topbar {
-    min-height:72px;
-    padding:9px 12px;
-    gap:10px;
-  }
-  .icon-btn { width:43px; height:43px; border-radius:14px; }
-  .brand-name { font-size:25px; }
-  .brand-sub { font-size:11px; }
-  .chat { padding:17px 14px; gap:18px; }
-  .msg { max-width:90%; }
-  .bubble { padding:12px 14px; font-size:15px; }
-  .composer-wrap { padding:10px 10px max(10px, env(safe-area-inset-bottom)); }
-  .composer { gap:3px; padding:5px 6px 5px 8px; }
-  .composer input { font-size:14px; padding:11px 2px; }
-  .tool { width:33px; height:36px; font-size:21px; }
-  .send { width:43px; height:43px; }
-}
-@media (prefers-reduced-motion:reduce) {
-  *, *::before, *::after { animation:none !important; scroll-behavior:auto !important; }
-}
-</style>
+  <!-- External stylesheet -->
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-<div class="scene" aria-hidden="true"></div>
+  <!-- Background image is handled by style.css -->
+  <div class="scene" aria-hidden="true"></div>
 
-<div class="app">
-  <header class="topbar">
-    <button class="icon-btn" id="openDrawer" aria-label="Open chats">＋</button>
-    <div class="brand">
-      <div class="brand-name">RADHA AI</div>
-      <div class="brand-sub"><span class="online"></span>Your personal assistant · Kanha 💙</div>
+  <div class="app">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <button
+        class="icon-btn"
+        id="openDrawer"
+        type="button"
+        aria-label="Open recent chats"
+      >＋</button>
+
+      <div class="brand">
+        <div class="brand-name">RADHA AI</div>
+        <div class="brand-sub">
+          <span class="online"></span>
+          Your personal assistant · Kanha 💙
+        </div>
+      </div>
+
+      <button
+        class="icon-btn"
+        id="theme"
+        type="button"
+        aria-label="Toggle theme"
+      >☾</button>
+    </header>
+
+    <!-- Full-screen conversation -->
+    <main class="chat" id="chat" aria-live="polite">
+      <div class="day" id="dayLabel"></div>
+    </main>
+
+    <!-- Typing indicator -->
+    <div class="typing" id="typing" aria-live="polite">
+      <div class="dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      RADHA is thinking...
     </div>
-    <button class="icon-btn" id="theme" aria-label="Toggle theme">☾</button>
-  </header>
 
-  <main class="chat" id="chat" aria-live="polite">
-    <div class="day" id="dayLabel"></div>
-  </main>
+    <!-- Message input -->
+    <div class="composer-wrap">
+      <form class="composer" id="form">
+        <button
+          class="tool"
+          type="button"
+          id="attach"
+          aria-label="Open chat menu"
+        >＋</button>
 
-  <div class="typing" id="typing">
-    <div class="dots"><span></span><span></span><span></span></div>
-    RADHA is thinking...
+        <input
+          id="message"
+          name="message"
+          type="text"
+          placeholder="Message RADHA, Kanha..."
+          autocomplete="off"
+          required
+        >
+
+        <button
+          class="tool"
+          type="button"
+          id="voice"
+          aria-label="Voice input"
+        >♩</button>
+
+        <button
+          class="send"
+          type="submit"
+          aria-label="Send message"
+        >➤</button>
+      </form>
+    </div>
   </div>
 
-  <div class="composer-wrap">
-    <form class="composer" id="form">
-      <button class="tool" type="button" id="attach" aria-label="New chat">＋</button>
-      <input id="message" placeholder="Message RADHA, Kanha..." autocomplete="off" required>
-      <button class="tool" type="button" id="voice" aria-label="Voice input">♩</button>
-      <button class="send" type="submit" aria-label="Send message">➤</button>
-    </form>
-  </div>
-</div>
+  <!-- Recent chat drawer -->
+  <div class="scrim" id="scrim"></div>
 
-<div class="scrim" id="scrim"></div>
+  <aside
+    class="drawer"
+    id="drawer"
+    aria-label="Chat history"
+    aria-hidden="true"
+  >
+    <div class="drawer-head">
+      <div class="drawer-title">RADHA AI</div>
 
-<aside class="drawer" id="drawer" aria-label="Chat history">
-  <div class="drawer-head">
-    <div class="drawer-title">RADHA AI</div>
-    <button class="close-btn" id="closeDrawer" aria-label="Close chats">×</button>
-  </div>
+      <button
+        class="close-btn"
+        id="closeDrawer"
+        type="button"
+        aria-label="Close chat menu"
+      >×</button>
+    </div>
 
-  <button class="new-chat" id="newChat">＋ &nbsp; New Chat</button>
+    <button class="new-chat" id="newChat" type="button">
+      ＋ &nbsp; New Chat
+    </button>
 
-  <div class="section-label">RECENT CHATS</div>
-  <div class="history" id="history"></div>
-  <div class="drawer-note">Your conversations are saved on this device 💙</div>
-</aside>
+    <div class="section-label">RECENT CHATS</div>
 
-<div class="toast" id="toast"></div>
+    <div class="history" id="history"></div>
 
-<script>
-const chat = document.getElementById("chat");
-const form = document.getElementById("form");
-const input = document.getElementById("message");
-const typing = document.getElementById("typing");
-const historyBox = document.getElementById("history");
-const drawer = document.getElementById("drawer");
-const scrim = document.getElementById("scrim");
-const dayLabel = document.getElementById("dayLabel");
-const toast = document.getElementById("toast");
+    <div class="drawer-note">
+      Your conversations are saved on this device 💙
+    </div>
+  </aside>
 
-const WELCOME = "Welcome back, Kanha! 💙\nI'm RADHA...\nWhat shall we talk about today?";
-const STORAGE_KEY = "radha-conversations-v2";
-let conversations = [];
-let currentId = null;
-let replyTimer = null;
+  <div class="toast" id="toast" role="status"></div>
 
-function makeId() {
-  return "chat-" + Date.now() + "-" + Math.random().toString(36).slice(2,7);
-}
-function timeNow() {
-  return new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
-}
-function dateLabel() {
-  return new Date().toLocaleDateString([], {
-    weekday:"short", month:"short", day:"numeric", year:"numeric"
-  });
-}
-dayLabel.textContent = "Today · " + dateLabel();
+  <script>
+    "use strict";
 
-function loadConversations() {
-  try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    if (Array.isArray(data)) conversations = data.filter(c =>
-      c && typeof c.id === "string" && Array.isArray(c.messages)
-    );
-  } catch(e) {
-    conversations = [];
-  }
-}
-function saveConversations() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
-  } catch(e) {
-    showToast("Device storage is full. Some chats may not save.");
-  }
-}
-function currentConversation() {
-  return conversations.find(c => c.id === currentId);
-}
-function makeConversation() {
-  const conversation = {
-    id: makeId(),
-    title: "New conversation",
-    updated: Date.now(),
-    messages: [{text:WELCOME, sender:"bot", time:timeNow()}]
-  };
-  conversations.unshift(conversation);
-  currentId = conversation.id;
-  saveConversations();
-  renderChat();
-  renderHistory();
-}
-function addBubble(text, sender, time) {
-  const row = document.createElement("div");
-  row.className = "msg " + (sender === "user" ? "user" : "bot");
+    const chat = document.getElementById("chat");
+    const form = document.getElementById("form");
+    const input = document.getElementById("message");
+    const typing = document.getElementById("typing");
+    const historyBox = document.getElementById("history");
+    const drawer = document.getElementById("drawer");
+    const scrim = document.getElementById("scrim");
+    const dayLabel = document.getElementById("dayLabel");
+    const toast = document.getElementById("toast");
 
-  const who = document.createElement("div");
-  who.className = "who";
-  who.textContent = sender === "user" ? "Kanha 💙" : "✧ RADHA";
+    const WELCOME =
+      "Welcome back, Kanha! 💙\nI'm RADHA...\nWhat shall we talk about today?";
 
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
-  bubble.textContent = text;
+    const STORAGE_KEY = "radha-conversations-v2";
+    const THEME_KEY = "radha-theme";
 
-  const timestamp = document.createElement("div");
-  timestamp.className = "time";
-  timestamp.textContent = time || timeNow();
+    let conversations = [];
+    let currentId = null;
+    let replyTimer = null;
+    let toastTimer = null;
 
-  row.append(who, bubble, timestamp);
-  chat.appendChild(row);
-}
-function renderChat() {
-  chat.replaceChildren(dayLabel);
-  const conversation = currentConversation();
-  if (conversation) {
-    conversation.messages.forEach(m => addBubble(m.text, m.sender, m.time));
-  }
-  chat.scrollTop = chat.scrollHeight;
-}
-function renderHistory() {
-  historyBox.replaceChildren();
-  if (!conversations.length) {
-    const empty = document.createElement("div");
-    empty.className = "empty-history";
-    empty.textContent = "Your previous conversations will appear here.";
-    historyBox.appendChild(empty);
-    return;
-  }
-  conversations.forEach(c => {
-    const button = document.createElement("button");
-    button.className = "history-item" + (c.id === currentId ? " active" : "");
-    button.type = "button";
+    function makeId() {
+      return "chat-" + Date.now() + "-" +
+        Math.random().toString(36).slice(2, 8);
+    }
 
-    const icon = document.createElement("span");
-    icon.className = "history-icon";
-    icon.textContent = "▢";
+    function timeNow() {
+      return new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
 
-    const title = document.createElement("span");
-    title.className = "history-text";
-    title.textContent = c.title || "New conversation";
+    function updateDayLabel() {
+      dayLabel.textContent = new Date().toLocaleDateString([], {
+        weekday: "short",
+        month: "short",
+        day: "numeric"
+      });
+    }
 
-    button.append(icon, title);
-    button.addEventListener("click", () => {
-      currentId = c.id;
+    function loadConversations() {
+      try {
+        const saved = JSON.parse(
+          localStorage.getItem(STORAGE_KEY) || "[]"
+        );
+
+        if (Array.isArray(saved)) {
+          conversations = saved.filter(item =>
+            item &&
+            typeof item.id === "string" &&
+            Array.isArray(item.messages)
+          );
+        }
+      } catch (error) {
+        conversations = [];
+      }
+    }
+
+    function saveConversations() {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(conversations)
+        );
+      } catch (error) {
+        showToast("Chats couldn't be saved on this device.");
+      }
+    }
+
+    function currentConversation() {
+      return conversations.find(item => item.id === currentId);
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2500);
+    }
+
+    function addBubble(message, shouldScroll = true) {
+      const row = document.createElement("div");
+      row.className = "msg " +
+        (message.sender === "user" ? "user" : "bot");
+
+      const who = document.createElement("div");
+      who.className = "who";
+      who.textContent = message.sender === "user"
+        ? "Kanha 💙"
+        : "✧ RADHA";
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = message.text;
+
+      const time = document.createElement("div");
+      time.className = "time";
+      time.textContent = message.time || timeNow();
+
+      row.append(who, bubble, time);
+      chat.appendChild(row);
+
+      if (shouldScroll) {
+        chat.scrollTop = chat.scrollHeight;
+      }
+    }
+
+    function renderChat() {
+      chat.replaceChildren(dayLabel);
+      updateDayLabel();
+
+      const conversation = currentConversation();
+
+      if (conversation) {
+        conversation.messages.forEach(message => {
+          addBubble(message, false);
+        });
+      }
+
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function renderHistory() {
+      historyBox.replaceChildren();
+
+      if (!conversations.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-history";
+        empty.textContent =
+          "Your previous conversations will appear here.";
+
+        historyBox.appendChild(empty);
+        return;
+      }
+
+      conversations.forEach(conversation => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "history-item" +
+          (conversation.id === currentId ? " active" : "");
+
+        const icon = document.createElement("span");
+        icon.className = "history-icon";
+        icon.textContent = "▢";
+
+        const title = document.createElement("span");
+        title.className = "history-text";
+        title.textContent = conversation.title || "New conversation";
+
+        button.append(icon, title);
+
+        button.addEventListener("click", () => {
+          currentId = conversation.id;
+          renderChat();
+          renderHistory();
+          closeDrawer();
+        });
+
+        historyBox.appendChild(button);
+      });
+    }
+
+    function createConversation() {
+      const conversation = {
+        id: makeId(),
+        title: "New conversation",
+        updated: Date.now(),
+        messages: [{
+          text: WELCOME,
+          sender: "bot",
+          time: timeNow()
+        }]
+      };
+
+      conversations.unshift(conversation);
+      currentId = conversation.id;
+
+      saveConversations();
       renderChat();
       renderHistory();
-      closeDrawer();
+    }
+
+    function saveMessage(text, sender) {
+      const conversation = currentConversation();
+      if (!conversation) return;
+
+      const message = {
+        text: text,
+        sender: sender,
+        time: timeNow()
+      };
+
+      conversation.messages.push(message);
+      conversation.updated = Date.now();
+
+      if (
+        sender === "user" &&
+        conversation.title === "New conversation"
+      ) {
+        conversation.title = text.length > 32
+          ? text.slice(0, 32) + "…"
+          : text;
+      }
+
+      conversations.sort((a, b) => b.updated - a.updated);
+
+      saveConversations();
+      addBubble(message);
+      renderHistory();
+    }
+
+    function radhaReply(text) {
+      const message = text.toLowerCase().trim();
+
+      if (/^(hi|hello|hey|hii|hlo)\b/.test(message)) {
+        return "Hey Kanha! 💙 I'm here. How are you today?";
+      }
+
+      if (message.includes("your name")) {
+        return "I'm RADHA, your personal assistant, Kanha! 💙";
+      }
+
+      if (message.includes("good morning")) {
+        return "Good morning, Kanha! ☀️";
+      }
+
+      if (message.includes("good night")) {
+        return "Good night, Kanha! 🌙";
+      }
+
+      if (message.includes("thank")) {
+        return "You're welcome, Kanha! 💙";
+      }
+
+      if (message.includes("time")) {
+        return "It's " + new Date().toLocaleTimeString() +
+          ", Kanha.";
+      }
+
+      if (message.includes("how are you")) {
+        return "I'm here and ready to chat with you, Kanha! 💙 What is on your mind?";
+      }
+
+      return "I received your message, Kanha! 💙 My real AI brain isn't connected yet. We can connect an AI service in the next stage.";
+    }
+
+    function openDrawer() {
+      drawer.classList.add("open");
+      scrim.classList.add("open");
+      drawer.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove("open");
+      scrim.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+    }
+
+    document.getElementById("openDrawer")
+      .addEventListener("click", openDrawer);
+
+    document.getElementById("closeDrawer")
+      .addEventListener("click", closeDrawer);
+
+    scrim.addEventListener("click", closeDrawer);
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeDrawer();
     });
-    historyBox.appendChild(button);
-  });
-}
-function saveMessage(text, sender) {
-  const c = currentConversation();
-  if (!c) return;
-  const item = {text, sender, time:timeNow()};
-  c.messages.push(item);
-  if (sender === "user" && c.title === "New conversation") {
-    c.title = text.length > 30 ? text.slice(0,30) + "…" : text;
-  }
-  c.updated = Date.now();
-  conversations.sort((a,b) => b.updated - a.updated);
-  saveConversations();
-  addBubble(item.text, item.sender, item.time);
-  chat.scrollTop = chat.scrollHeight;
-  renderHistory();
-}
-function radhaReply(text) {
-  const m = text.toLowerCase().trim();
 
-  if (/^(hi|hello|hey|hii|hlo)\b/.test(m))
-    return "Hey Kanha! 💙 I'm here. How are you today?";
-  if (m.includes("your name"))
-    return "I'm RADHA, your personal assistant, Kanha! 💙";
-  if (m.includes("time"))
-    return "It's " + new Date().toLocaleTimeString() + ", Kanha.";
-  if (m.includes("thank"))
-    return "You're welcome, Kanha! 💙";
-  if (m.includes("good morning"))
-    return "Good morning, Kanha! ☀️";
-  if (m.includes("good night"))
-    return "Good night, Kanha! 🌙";
-  if (m.includes("how are you"))
-    return "I'm here and ready to chat with you, Kanha! 💙 What is on your mind?";
-  return "I received your message, Kanha! 💙 My real AI brain isn't connected yet. We can connect an AI service in the next stage.";
-}
-function showToast(message) {
-  toast.textContent = message;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 2400);
-}
-function openDrawer() {
-  drawer.classList.add("open");
-  scrim.classList.add("open");
-}
-function closeDrawer() {
-  drawer.classList.remove("open");
-  scrim.classList.remove("open");
-}
+    document.getElementById("newChat")
+      .addEventListener("click", () => {
+        if (replyTimer) clearTimeout(replyTimer);
 
-document.getElementById("openDrawer").addEventListener("click", openDrawer);
-document.getElementById("closeDrawer").addEventListener("click", closeDrawer);
-scrim.addEventListener("click", closeDrawer);
+        typing.classList.remove("show");
+        createConversation();
+        closeDrawer();
+        input.focus();
+      });
 
-document.getElementById("newChat").addEventListener("click", () => {
-  if (replyTimer) clearTimeout(replyTimer);
-  typing.classList.remove("show");
-  makeConversation();
-  closeDrawer();
-  input.focus();
-});
-document.getElementById("attach").addEventListener("click", () => {
-  openDrawer();
-});
+    document.getElementById("attach")
+      .addEventListener("click", openDrawer);
 
-form.addEventListener("submit", event => {
-  event.preventDefault();
-  const text = input.value.trim();
-  if (!text) return;
+    form.addEventListener("submit", event => {
+      event.preventDefault();
 
-  if (replyTimer) clearTimeout(replyTimer);
-  saveMessage(text, "user");
-  input.value = "";
-  typing.classList.add("show");
+      const text = input.value.trim();
+      if (!text) return;
 
-  replyTimer = setTimeout(() => {
-    typing.classList.remove("show");
-    saveMessage(radhaReply(text), "bot");
-    replyTimer = null;
-  }, 450);
-});
+      if (replyTimer) clearTimeout(replyTimer);
 
-document.getElementById("voice").addEventListener("click", () => {
-  const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!Speech) {
-    showToast("Voice input is not supported in this browser.");
-    return;
-  }
-  const recognition = new Speech();
-  recognition.lang = "en-IN";
-  recognition.onresult = event => {
-    input.value = event.results[0][0].transcript;
-    input.focus();
-  };
-  recognition.onerror = () => showToast("Voice input couldn't start. Try again.");
-  recognition.start();
-});
+      saveMessage(text, "user");
+      input.value = "";
+      typing.classList.add("show");
 
-document.getElementById("theme").addEventListener("click", () => {
-  document.body.classList.toggle("light");
-  document.getElementById("theme").textContent =
-    document.body.classList.contains("light") ? "☀" : "☾";
-});
+      replyTimer = setTimeout(() => {
+        typing.classList.remove("show");
+        saveMessage(radhaReply(text), "bot");
+        replyTimer = null;
+      }, 450);
+    });
 
-loadConversations();
-if (conversations.length) {
-  conversations.sort((a,b) => b.updated - a.updated);
-  currentId = conversations[0].id;
-  renderChat();
-} else {
-  makeConversation();
-}
-renderHistory();
-</script>
+    document.getElementById("voice")
+      .addEventListener("click", () => {
+        const Speech =
+          window.SpeechRecognition ||
+          window.webkitSpeechRecognition;
+
+        if (!Speech) {
+          showToast("Voice input is not supported in this browser.");
+          return;
+        }
+
+        const recognition = new Speech();
+        recognition.lang = "en-IN";
+
+        recognition.onresult = event => {
+          input.value = event.results[0][0].transcript;
+          input.focus();
+        };
+
+        recognition.onerror = () => {
+          showToast("Voice input couldn't start. Try again.");
+        };
+
+        recognition.start();
+      });
+
+    document.getElementById("theme")
+      .addEventListener("click", () => {
+        document.body.classList.toggle("light");
+
+        const lightMode = document.body.classList.contains("light");
+
+        document.getElementById("theme").textContent =
+          lightMode ? "☀" : "☾";
+
+        try {
+          localStorage.setItem(
+            THEME_KEY,
+            lightMode ? "light" : "dark"
+          );
+        } catch (error) {}
+      });
+
+    /* Restore saved theme */
+    try {
+      if (localStorage.getItem(THEME_KEY) === "light") {
+        document.body.classList.add("light");
+        document.getElementById("theme").textContent = "☀";
+      }
+    } catch (error) {}
+
+    /* Restore chats or start a fresh conversation */
+    loadConversations();
+
+    if (conversations.length) {
+      conversations.sort((a, b) => b.updated - a.updated);
+      currentId = conversations[0].id;
+      renderChat();
+      renderHistory();
+    } else {
+      createConversation();
+    }
+  </script>
 </body>
 </html>
