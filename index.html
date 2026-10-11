@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,12 +15,10 @@
   <div class="app">
     <header class="topbar">
       <button class="icon-btn" id="openDrawer" type="button" aria-label="Open recent chats">＋</button>
-
       <div class="brand">
         <div class="brand-name">RADHA AI</div>
         <div class="brand-sub"><span class="online"></span> Your personal assistant · Kanha 💙</div>
       </div>
-
       <button class="icon-btn" id="theme" type="button" aria-label="Toggle theme">☾</button>
     </header>
 
@@ -49,7 +48,6 @@
       <div class="drawer-title">RADHA AI</div>
       <button class="close-btn" id="closeDrawer" type="button" aria-label="Close chat menu">×</button>
     </div>
-
     <button class="new-chat" id="newChat" type="button">＋ &nbsp; New Chat</button>
     <div class="section-label">RECENT CHATS</div>
     <div class="history" id="history"></div>
@@ -61,6 +59,7 @@
   <script>
     "use strict";
 
+    const API_URL = "https://radha-mu.vercel.app/api/chat";
     const chat = document.getElementById("chat");
     const form = document.getElementById("form");
     const input = document.getElementById("message");
@@ -70,6 +69,7 @@
     const scrim = document.getElementById("scrim");
     const dayLabel = document.getElementById("dayLabel");
     const toast = document.getElementById("toast");
+    const sendButton = form.querySelector(".send");
 
     const WELCOME = "Welcome back, Kanha! 💙\nI'm RADHA...\nWhat shall we talk about today?";
     const STORAGE_KEY = "radha-conversations-v2";
@@ -77,20 +77,25 @@
 
     let conversations = [];
     let currentId = null;
-    let replyTimer = null;
     let toastTimer = null;
+    let sending = false;
 
     function makeId() {
       return "chat-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
     }
 
     function timeNow() {
-      return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      return new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
     }
 
     function updateDayLabel() {
       dayLabel.textContent = new Date().toLocaleDateString([], {
-        weekday: "short", month: "short", day: "numeric"
+        weekday: "short",
+        month: "short",
+        day: "numeric"
       });
     }
 
@@ -102,7 +107,7 @@
             item && typeof item.id === "string" && Array.isArray(item.messages)
           );
         }
-      } catch (error) {
+      } catch {
         conversations = [];
       }
     }
@@ -110,7 +115,7 @@
     function saveConversations() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
-      } catch (error) {
+      } catch {
         showToast("Chats couldn't be saved on this device.");
       }
     }
@@ -123,7 +128,7 @@
       toast.textContent = message;
       toast.classList.add("show");
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove("show"), 2500);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 3500);
     }
 
     function addBubble(message, shouldScroll = true) {
@@ -152,7 +157,9 @@
       chat.replaceChildren(dayLabel);
       updateDayLabel();
       const conversation = currentConversation();
-      if (conversation) conversation.messages.forEach(message => addBubble(message, false));
+      if (conversation) {
+        conversation.messages.forEach(message => addBubble(message, false));
+      }
       chat.scrollTop = chat.scrollHeight;
     }
 
@@ -170,7 +177,8 @@
       conversations.forEach(conversation => {
         const button = document.createElement("button");
         button.type = "button";
-        button.className = "history-item" + (conversation.id === currentId ? " active" : "");
+        button.className = "history-item" +
+          (conversation.id === currentId ? " active" : "");
 
         const icon = document.createElement("span");
         icon.className = "history-icon";
@@ -187,6 +195,7 @@
           renderHistory();
           closeDrawer();
         });
+
         historyBox.appendChild(button);
       });
     }
@@ -215,27 +224,15 @@
       conversation.updated = Date.now();
 
       if (sender === "user" && conversation.title === "New conversation") {
-        conversation.title = text.length > 32 ? text.slice(0, 32) + "…" : text;
+        conversation.title = text.length > 32
+          ? text.slice(0, 32) + "…"
+          : text;
       }
 
       conversations.sort((a, b) => b.updated - a.updated);
       saveConversations();
       addBubble(message);
       renderHistory();
-    }
-
-    function radhaReply(text) {
-      const message = text.toLowerCase().trim();
-
-      if (/^(hi|hello|hey|hii|hlo)\b/.test(message)) return "Hey Kanha! 💙 I'm here. How are you today?";
-      if (message.includes("your name")) return "I'm RADHA, your personal assistant, Kanha! 💙";
-      if (message.includes("good morning")) return "Good morning, Kanha! ☀️";
-      if (message.includes("good night")) return "Good night, Kanha! 🌙";
-      if (message.includes("thank")) return "You're welcome, Kanha! 💙";
-      if (message.includes("time")) return "It's " + new Date().toLocaleTimeString() + ", Kanha.";
-      if (message.includes("how are you")) return "I'm here and ready to chat with you, Kanha! 💙 What is on your mind?";
-
-      return "I received your message, Kanha! 💙 My real AI brain isn't connected yet. We can connect an AI service in the next stage.";
     }
 
     function openDrawer() {
@@ -253,13 +250,16 @@
     document.getElementById("openDrawer").addEventListener("click", openDrawer);
     document.getElementById("closeDrawer").addEventListener("click", closeDrawer);
     scrim.addEventListener("click", closeDrawer);
+
     document.addEventListener("keydown", event => {
       if (event.key === "Escape") closeDrawer();
     });
 
     document.getElementById("newChat").addEventListener("click", () => {
-      if (replyTimer) clearTimeout(replyTimer);
-      typing.classList.remove("show");
+      if (sending) {
+        showToast("Please wait for RADHA's current reply.");
+        return;
+      }
       createConversation();
       closeDrawer();
       input.focus();
@@ -267,25 +267,87 @@
 
     document.getElementById("attach").addEventListener("click", openDrawer);
 
-    form.addEventListener("submit", event => {
+    // Send the user's message to the secure Vercel backend.
+    form.addEventListener("submit", async event => {
       event.preventDefault();
+
+      if (sending) return;
+
       const text = input.value.trim();
       if (!text) return;
 
-      if (replyTimer) clearTimeout(replyTimer);
+      const conversation = currentConversation();
+      if (!conversation) return;
+
+      // Capture history before saving the new message.
+      const history = conversation.messages
+        .filter(m => m.sender === "user" || m.sender === "bot")
+        .slice(-10)
+        .map(m => ({
+          role: m.sender === "user" ? "user" : "assistant",
+          content: m.text
+        }));
+
       saveMessage(text, "user");
       input.value = "";
+      sending = true;
+      input.disabled = true;
+      sendButton.disabled = true;
       typing.classList.add("show");
 
-      replyTimer = setTimeout(() => {
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: text,
+            history
+          })
+        });
+
+        let data;
+        try {
+          data = await response.json();
+        } catch {
+          throw new Error("Server returned an invalid response.");
+        }
+
+        if (!response.ok) {
+          throw new Error(data.error || `Request failed (${response.status})`);
+        }
+
+        if (typeof data.reply !== "string" || !data.reply.trim()) {
+          throw new Error("RADHA returned an empty reply.");
+        }
+
+        // Keep replies in the conversation where the request began.
+        const previousId = currentId;
+        currentId = conversation.id;
+        saveMessage(data.reply, "bot");
+        currentId = previousId;
+        renderChat();
+        renderHistory();
+      } catch (error) {
+        console.error("RADHA request failed:", error);
+        showToast(
+          error.message === "Failed to fetch"
+            ? "Couldn't reach RADHA. Check backend/CORS settings."
+            : error.message || "Couldn't connect to RADHA AI."
+        );
+      } finally {
         typing.classList.remove("show");
-        saveMessage(radhaReply(text), "bot");
-        replyTimer = null;
-      }, 450);
+        sending = false;
+        input.disabled = false;
+        sendButton.disabled = false;
+        input.focus();
+      }
     });
 
     document.getElementById("voice").addEventListener("click", () => {
       const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+
       if (!Speech) {
         showToast("Voice input is not supported in this browser.");
         return;
@@ -293,11 +355,15 @@
 
       const recognition = new Speech();
       recognition.lang = "en-IN";
+
       recognition.onresult = event => {
         input.value = event.results[0][0].transcript;
         input.focus();
       };
-      recognition.onerror = () => showToast("Voice input couldn't start. Try again.");
+
+      recognition.onerror = () =>
+        showToast("Voice input couldn't start. Try again.");
+
       recognition.start();
     });
 
@@ -305,9 +371,10 @@
       document.body.classList.toggle("light");
       const lightMode = document.body.classList.contains("light");
       document.getElementById("theme").textContent = lightMode ? "☀" : "☾";
+
       try {
         localStorage.setItem(THEME_KEY, lightMode ? "light" : "dark");
-      } catch (error) {}
+      } catch {}
     });
 
     try {
@@ -315,7 +382,7 @@
         document.body.classList.add("light");
         document.getElementById("theme").textContent = "☀";
       }
-    } catch (error) {}
+    } catch {}
 
     loadConversations();
 
@@ -329,4 +396,5 @@
     }
   </script>
 </body>
-</html>
+  </html>
+  
