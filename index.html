@@ -4,125 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#030817">
-
   <title>RADHA AI</title>
-
-  <!-- External stylesheet -->
   <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-  <!-- Background image is handled by style.css -->
   <div class="scene" aria-hidden="true"></div>
 
   <div class="app">
-
-    <!-- Top bar -->
     <header class="topbar">
-      <button
-        class="icon-btn"
-        id="openDrawer"
-        type="button"
-        aria-label="Open recent chats"
-      >＋</button>
+      <button class="icon-btn" id="openDrawer" type="button" aria-label="Open recent chats">＋</button>
 
       <div class="brand">
         <div class="brand-name">RADHA AI</div>
-        <div class="brand-sub">
-          <span class="online"></span>
-          Your personal assistant · Kanha 💙
-        </div>
+        <div class="brand-sub"><span class="online"></span> Your personal assistant · Kanha 💙</div>
       </div>
 
-      <button
-        class="icon-btn"
-        id="theme"
-        type="button"
-        aria-label="Toggle theme"
-      >☾</button>
+      <button class="icon-btn" id="theme" type="button" aria-label="Toggle theme">☾</button>
     </header>
 
-    <!-- Full-screen conversation -->
     <main class="chat" id="chat" aria-live="polite">
       <div class="day" id="dayLabel"></div>
     </main>
 
-    <!-- Typing indicator -->
     <div class="typing" id="typing" aria-live="polite">
-      <div class="dots">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
+      <div class="dots"><span></span><span></span><span></span></div>
       RADHA is thinking...
     </div>
 
-    <!-- Message input -->
     <div class="composer-wrap">
       <form class="composer" id="form">
-        <button
-          class="tool"
-          type="button"
-          id="attach"
-          aria-label="Open chat menu"
-        >＋</button>
-
-        <input
-          id="message"
-          name="message"
-          type="text"
-          placeholder="Message RADHA, Kanha..."
-          autocomplete="off"
-          required
-        >
-
-        <button
-          class="tool"
-          type="button"
-          id="voice"
-          aria-label="Voice input"
-        >♩</button>
-
-        <button
-          class="send"
-          type="submit"
-          aria-label="Send message"
-        >➤</button>
+        <button class="tool" type="button" id="attach" aria-label="Open chat menu">＋</button>
+        <input id="message" name="message" type="text" placeholder="Message RADHA, Kanha..." autocomplete="off" required>
+        <button class="tool" type="button" id="voice" aria-label="Voice input">♩</button>
+        <button class="send" type="submit" aria-label="Send message">➤</button>
       </form>
     </div>
   </div>
 
-  <!-- Recent chat drawer -->
   <div class="scrim" id="scrim"></div>
 
-  <aside
-    class="drawer"
-    id="drawer"
-    aria-label="Chat history"
-    aria-hidden="true"
-  >
+  <aside class="drawer" id="drawer" aria-label="Chat history" aria-hidden="true">
     <div class="drawer-head">
       <div class="drawer-title">RADHA AI</div>
-
-      <button
-        class="close-btn"
-        id="closeDrawer"
-        type="button"
-        aria-label="Close chat menu"
-      >×</button>
+      <button class="close-btn" id="closeDrawer" type="button" aria-label="Close chat menu">×</button>
     </div>
 
-    <button class="new-chat" id="newChat" type="button">
-      ＋ &nbsp; New Chat
-    </button>
-
+    <button class="new-chat" id="newChat" type="button">＋ &nbsp; New Chat</button>
     <div class="section-label">RECENT CHATS</div>
-
     <div class="history" id="history"></div>
-
-    <div class="drawer-note">
-      Your conversations are saved on this device 💙
-    </div>
+    <div class="drawer-note">Your conversations are saved on this device 💙</div>
   </aside>
 
   <div class="toast" id="toast" role="status"></div>
@@ -140,9 +71,7 @@
     const dayLabel = document.getElementById("dayLabel");
     const toast = document.getElementById("toast");
 
-    const WELCOME =
-      "Welcome back, Kanha! 💙\nI'm RADHA...\nWhat shall we talk about today?";
-
+    const WELCOME = "Welcome back, Kanha! 💙\nI'm RADHA...\nWhat shall we talk about today?";
     const STORAGE_KEY = "radha-conversations-v2";
     const THEME_KEY = "radha-theme";
 
@@ -152,36 +81,25 @@
     let toastTimer = null;
 
     function makeId() {
-      return "chat-" + Date.now() + "-" +
-        Math.random().toString(36).slice(2, 8);
+      return "chat-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
     }
 
     function timeNow() {
-      return new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit"
-      });
+      return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
 
     function updateDayLabel() {
       dayLabel.textContent = new Date().toLocaleDateString([], {
-        weekday: "short",
-        month: "short",
-        day: "numeric"
+        weekday: "short", month: "short", day: "numeric"
       });
     }
 
     function loadConversations() {
       try {
-        const saved = JSON.parse(
-          localStorage.getItem(STORAGE_KEY) || "[]"
-        );
-
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
         if (Array.isArray(saved)) {
           conversations = saved.filter(item =>
-            item &&
-            typeof item.id === "string" &&
-            Array.isArray(item.messages)
+            item && typeof item.id === "string" && Array.isArray(item.messages)
           );
         }
       } catch (error) {
@@ -191,10 +109,7 @@
 
     function saveConversations() {
       try {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify(conversations)
-        );
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
       } catch (error) {
         showToast("Chats couldn't be saved on this device.");
       }
@@ -207,23 +122,17 @@
     function showToast(message) {
       toast.textContent = message;
       toast.classList.add("show");
-
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2500);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2500);
     }
 
     function addBubble(message, shouldScroll = true) {
       const row = document.createElement("div");
-      row.className = "msg " +
-        (message.sender === "user" ? "user" : "bot");
+      row.className = "msg " + (message.sender === "user" ? "user" : "bot");
 
       const who = document.createElement("div");
       who.className = "who";
-      who.textContent = message.sender === "user"
-        ? "Kanha 💙"
-        : "✧ RADHA";
+      who.textContent = message.sender === "user" ? "Kanha 💙" : "✧ RADHA";
 
       const bubble = document.createElement("div");
       bubble.className = "bubble";
@@ -236,23 +145,14 @@
       row.append(who, bubble, time);
       chat.appendChild(row);
 
-      if (shouldScroll) {
-        chat.scrollTop = chat.scrollHeight;
-      }
+      if (shouldScroll) chat.scrollTop = chat.scrollHeight;
     }
 
     function renderChat() {
       chat.replaceChildren(dayLabel);
       updateDayLabel();
-
       const conversation = currentConversation();
-
-      if (conversation) {
-        conversation.messages.forEach(message => {
-          addBubble(message, false);
-        });
-      }
-
+      if (conversation) conversation.messages.forEach(message => addBubble(message, false));
       chat.scrollTop = chat.scrollHeight;
     }
 
@@ -262,9 +162,7 @@
       if (!conversations.length) {
         const empty = document.createElement("div");
         empty.className = "empty-history";
-        empty.textContent =
-          "Your previous conversations will appear here.";
-
+        empty.textContent = "Your previous conversations will appear here.";
         historyBox.appendChild(empty);
         return;
       }
@@ -272,8 +170,7 @@
       conversations.forEach(conversation => {
         const button = document.createElement("button");
         button.type = "button";
-        button.className = "history-item" +
-          (conversation.id === currentId ? " active" : "");
+        button.className = "history-item" + (conversation.id === currentId ? " active" : "");
 
         const icon = document.createElement("span");
         icon.className = "history-icon";
@@ -284,14 +181,12 @@
         title.textContent = conversation.title || "New conversation";
 
         button.append(icon, title);
-
         button.addEventListener("click", () => {
           currentId = conversation.id;
           renderChat();
           renderHistory();
           closeDrawer();
         });
-
         historyBox.appendChild(button);
       });
     }
@@ -301,16 +196,11 @@
         id: makeId(),
         title: "New conversation",
         updated: Date.now(),
-        messages: [{
-          text: WELCOME,
-          sender: "bot",
-          time: timeNow()
-        }]
+        messages: [{ text: WELCOME, sender: "bot", time: timeNow() }]
       };
 
       conversations.unshift(conversation);
       currentId = conversation.id;
-
       saveConversations();
       renderChat();
       renderHistory();
@@ -320,26 +210,15 @@
       const conversation = currentConversation();
       if (!conversation) return;
 
-      const message = {
-        text: text,
-        sender: sender,
-        time: timeNow()
-      };
-
+      const message = { text, sender, time: timeNow() };
       conversation.messages.push(message);
       conversation.updated = Date.now();
 
-      if (
-        sender === "user" &&
-        conversation.title === "New conversation"
-      ) {
-        conversation.title = text.length > 32
-          ? text.slice(0, 32) + "…"
-          : text;
+      if (sender === "user" && conversation.title === "New conversation") {
+        conversation.title = text.length > 32 ? text.slice(0, 32) + "…" : text;
       }
 
       conversations.sort((a, b) => b.updated - a.updated);
-
       saveConversations();
       addBubble(message);
       renderHistory();
@@ -348,34 +227,13 @@
     function radhaReply(text) {
       const message = text.toLowerCase().trim();
 
-      if (/^(hi|hello|hey|hii|hlo)\b/.test(message)) {
-        return "Hey Kanha! 💙 I'm here. How are you today?";
-      }
-
-      if (message.includes("your name")) {
-        return "I'm RADHA, your personal assistant, Kanha! 💙";
-      }
-
-      if (message.includes("good morning")) {
-        return "Good morning, Kanha! ☀️";
-      }
-
-      if (message.includes("good night")) {
-        return "Good night, Kanha! 🌙";
-      }
-
-      if (message.includes("thank")) {
-        return "You're welcome, Kanha! 💙";
-      }
-
-      if (message.includes("time")) {
-        return "It's " + new Date().toLocaleTimeString() +
-          ", Kanha.";
-      }
-
-      if (message.includes("how are you")) {
-        return "I'm here and ready to chat with you, Kanha! 💙 What is on your mind?";
-      }
+      if (/^(hi|hello|hey|hii|hlo)\b/.test(message)) return "Hey Kanha! 💙 I'm here. How are you today?";
+      if (message.includes("your name")) return "I'm RADHA, your personal assistant, Kanha! 💙";
+      if (message.includes("good morning")) return "Good morning, Kanha! ☀️";
+      if (message.includes("good night")) return "Good night, Kanha! 🌙";
+      if (message.includes("thank")) return "You're welcome, Kanha! 💙";
+      if (message.includes("time")) return "It's " + new Date().toLocaleTimeString() + ", Kanha.";
+      if (message.includes("how are you")) return "I'm here and ready to chat with you, Kanha! 💙 What is on your mind?";
 
       return "I received your message, Kanha! 💙 My real AI brain isn't connected yet. We can connect an AI service in the next stage.";
     }
@@ -392,39 +250,29 @@
       drawer.setAttribute("aria-hidden", "true");
     }
 
-    document.getElementById("openDrawer")
-      .addEventListener("click", openDrawer);
-
-    document.getElementById("closeDrawer")
-      .addEventListener("click", closeDrawer);
-
+    document.getElementById("openDrawer").addEventListener("click", openDrawer);
+    document.getElementById("closeDrawer").addEventListener("click", closeDrawer);
     scrim.addEventListener("click", closeDrawer);
-
     document.addEventListener("keydown", event => {
       if (event.key === "Escape") closeDrawer();
     });
 
-    document.getElementById("newChat")
-      .addEventListener("click", () => {
-        if (replyTimer) clearTimeout(replyTimer);
+    document.getElementById("newChat").addEventListener("click", () => {
+      if (replyTimer) clearTimeout(replyTimer);
+      typing.classList.remove("show");
+      createConversation();
+      closeDrawer();
+      input.focus();
+    });
 
-        typing.classList.remove("show");
-        createConversation();
-        closeDrawer();
-        input.focus();
-      });
-
-    document.getElementById("attach")
-      .addEventListener("click", openDrawer);
+    document.getElementById("attach").addEventListener("click", openDrawer);
 
     form.addEventListener("submit", event => {
       event.preventDefault();
-
       const text = input.value.trim();
       if (!text) return;
 
       if (replyTimer) clearTimeout(replyTimer);
-
       saveMessage(text, "user");
       input.value = "";
       typing.classList.add("show");
@@ -436,50 +284,32 @@
       }, 450);
     });
 
-    document.getElementById("voice")
-      .addEventListener("click", () => {
-        const Speech =
-          window.SpeechRecognition ||
-          window.webkitSpeechRecognition;
+    document.getElementById("voice").addEventListener("click", () => {
+      const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!Speech) {
+        showToast("Voice input is not supported in this browser.");
+        return;
+      }
 
-        if (!Speech) {
-          showToast("Voice input is not supported in this browser.");
-          return;
-        }
+      const recognition = new Speech();
+      recognition.lang = "en-IN";
+      recognition.onresult = event => {
+        input.value = event.results[0][0].transcript;
+        input.focus();
+      };
+      recognition.onerror = () => showToast("Voice input couldn't start. Try again.");
+      recognition.start();
+    });
 
-        const recognition = new Speech();
-        recognition.lang = "en-IN";
+    document.getElementById("theme").addEventListener("click", () => {
+      document.body.classList.toggle("light");
+      const lightMode = document.body.classList.contains("light");
+      document.getElementById("theme").textContent = lightMode ? "☀" : "☾";
+      try {
+        localStorage.setItem(THEME_KEY, lightMode ? "light" : "dark");
+      } catch (error) {}
+    });
 
-        recognition.onresult = event => {
-          input.value = event.results[0][0].transcript;
-          input.focus();
-        };
-
-        recognition.onerror = () => {
-          showToast("Voice input couldn't start. Try again.");
-        };
-
-        recognition.start();
-      });
-
-    document.getElementById("theme")
-      .addEventListener("click", () => {
-        document.body.classList.toggle("light");
-
-        const lightMode = document.body.classList.contains("light");
-
-        document.getElementById("theme").textContent =
-          lightMode ? "☀" : "☾";
-
-        try {
-          localStorage.setItem(
-            THEME_KEY,
-            lightMode ? "light" : "dark"
-          );
-        } catch (error) {}
-      });
-
-    /* Restore saved theme */
     try {
       if (localStorage.getItem(THEME_KEY) === "light") {
         document.body.classList.add("light");
@@ -487,7 +317,6 @@
       }
     } catch (error) {}
 
-    /* Restore chats or start a fresh conversation */
     loadConversations();
 
     if (conversations.length) {
