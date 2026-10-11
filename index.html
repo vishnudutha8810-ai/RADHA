@@ -3,188 +3,582 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#030817">
-<title>RADHA AI</title>
+<title>RADHA AI — Your Little Corner</title>
+
 <style>
 *{box-sizing:border-box}
-:root{--blue:#2868ff;--glow:#77aaff;--gold:#f4d39a;--text:#f1f5ff;--muted:#9eb4d8}
-body{margin:0;background:#030817;color:var(--text);font:14px Arial,sans-serif;min-height:100vh}
+:root{
+  --blue:#2868ff;
+  --glow:#77aaff;
+  --gold:#f4d39a;
+  --text:#f1f5ff;
+  --muted:#b1c4e4;
+}
+body{
+  margin:0;
+  background:#030817;
+  color:var(--text);
+  font:14px Arial,sans-serif;
+  min-height:100vh;
+}
 button,input{font:inherit}
 button{cursor:pointer;color:inherit}
-button:focus-visible,input:focus-visible{outline:2px solid #80b8ff;outline-offset:2px}
-.scene{position:fixed;inset:0;z-index:-3;overflow:hidden;background:linear-gradient(#020719 0%,#10244a 42%,#030817 100%)}
-.sky{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 20%,#234c8c88,transparent 43%),radial-gradient(ellipse at 10% 50%,#a75e2655,transparent 30%),radial-gradient(ellipse at 90% 50%,#bc742e55,transparent 30%)}
-.moon{position:absolute;top:4%;left:61%;width:95px;height:95px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#fffde8,#f5e6bf 48%,#b8bdd0 85%);box-shadow:0 0 24px #c3d9ff99,0 0 85px #80aaff55}
-.stars{position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1.5px),radial-gradient(#8bbaff 1px,transparent 1.5px);background-size:67px 73px,113px 97px;background-position:10px 12px,42px 31px;opacity:.65}
-.arch{position:absolute;top:-90px;width:190px;height:530px;border:18px solid #281d23;border-bottom:0;border-radius:100px 100px 0 0;box-shadow:inset 5px 0 8px #f3b45c44,0 0 15px #000;opacity:.8}
-.arch.left{left:-110px}.arch.right{right:-110px}
-.water{position:absolute;left:0;right:0;bottom:0;height:49%;background:linear-gradient(180deg,#0d2343aa,#020919 92%);border-top:2px solid #e6ac6455}
-.water:before{content:"";position:absolute;left:20%;right:20%;top:0;height:100%;background:repeating-linear-gradient(175deg,transparent 0 14px,#f2b56824 15px 17px,transparent 19px 32px);transform:perspective(170px) rotateX(12deg);filter:blur(1px)}
-.reflection{position:absolute;top:0;left:59%;width:115px;height:100%;background:linear-gradient(#ffe1a988,#d18a3933,transparent);filter:blur(15px)}
-.lights{position:absolute;inset:15% 0 15%;background:radial-gradient(circle at 9% 35%,#ffd49c 0 2px,transparent 6px),radial-gradient(circle at 17% 51%,#f8b95d 0 2px,transparent 8px),radial-gradient(circle at 86% 37%,#ffe0a4 0 2px,transparent 7px),radial-gradient(circle at 94% 53%,#f5b45c 0 2px,transparent 9px),radial-gradient(circle at 31% 57%,#ffc77b 0 2px,transparent 8px),radial-gradient(circle at 76% 56%,#ffd18c 0 2px,transparent 8px)}
-.lotus{position:absolute;bottom:20%;left:18%;color:#ffc5d5;text-shadow:0 0 14px #ffb3d9;font-size:24px}
-.lotus.two{left:73%;bottom:15%;font-size:30px}.lotus.three{left:52%;bottom:24%;font-size:20px}
-.app{max-width:1600px;min-height:100vh;margin:auto;padding:18px;display:grid;grid-template-columns:290px minmax(0,1fr);gap:18px}
-.glass{background:linear-gradient(145deg,#030b1bed,#071329e8);border:1px solid #5689e98a;border-radius:23px;box-shadow:0 0 28px #2165ff16,inset 0 0 25px #1e4c8b0b;backdrop-filter:blur(13px)}
-.sidebar{padding:20px 16px;display:flex;flex-direction:column;gap:14px;min-height:calc(100vh - 36px)}
-.brand{text-align:center;font:40px Georgia,serif;color:var(--gold);text-shadow:0 0 17px #f3c78055;white-space:nowrap}
+button:focus-visible,input:focus-visible{
+  outline:2px solid #80b8ff;
+  outline-offset:2px;
+}
+
+/* POSTER IMAGE BACKGROUND */
+.scene{
+  position:fixed;
+  inset:0;
+  z-index:-3;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(2,7,20,.30),
+      rgba(2,7,20,.48) 55%,
+      rgba(2,7,20,.72)
+    ),
+    url("file_000000005b208211946b4d1d0212b66c.png")
+    center center / cover no-repeat;
+}
+
+/* The poster already contains the moon, arches and water */
+.scene>*{display:none}
+
+/* MAIN LAYOUT */
+.app{
+  max-width:1600px;
+  min-height:100vh;
+  margin:auto;
+  padding:18px;
+  display:grid;
+  grid-template-columns:290px minmax(0,1fr);
+  gap:18px;
+}
+.glass{
+  background:rgba(3,10,27,.82);
+  border:1px solid #5689e9a0;
+  border-radius:23px;
+  box-shadow:0 0 28px #2165ff22,
+             inset 0 0 25px #1e4c8b12;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.sidebar{
+  padding:20px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-height:calc(100vh - 36px);
+}
+.brand{
+  text-align:center;
+  font:40px Georgia,serif;
+  color:var(--gold);
+  text-shadow:0 0 17px #f3c78066;
+  white-space:nowrap;
+}
 .brand span{font:25px Arial;color:#7faaff}
-.tagline{text-align:center;color:#b8cbed;margin-top:-8px;font-size:12px}
-.btn{border:1px solid transparent;background:transparent;border-radius:13px;text-align:left;padding:13px;color:#c5d4ef;display:flex;align-items:center;gap:12px;width:100%;transition:.2s}
+.tagline{
+  text-align:center;
+  color:#c4d5f2;
+  margin-top:-8px;
+  font-size:12px;
+}
+.btn{
+  border:1px solid transparent;
+  background:transparent;
+  border-radius:13px;
+  text-align:left;
+  padding:13px;
+  color:#d0def7;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  transition:.2s;
+}
 .btn:hover{background:#16305a}
-.btn.active{background:linear-gradient(100deg,#164ac4,#0b2153);border-color:#568bff55;color:white;box-shadow:0 0 20px #1b65ff35}
-.new{background:linear-gradient(110deg,#286cff,#092b88);border:1px solid #6b9cff88;color:white;border-radius:15px;padding:14px}
+.btn.active{
+  background:linear-gradient(100deg,#164ac4,#0b2153);
+  border-color:#568bff75;
+  color:white;
+  box-shadow:0 0 20px #1b65ff35;
+}
+.new{
+  background:linear-gradient(110deg,#286cff,#092b88);
+  border:1px solid #6b9cff88;
+  color:white;
+  border-radius:15px;
+  padding:14px;
+  width:100%;
+}
 .new:hover{filter:brightness(1.2)}
-.label{font-size:12px;color:#8fa9d2;margin:12px 5px 4px}
+.label{
+  font-size:12px;
+  color:#a8bee2;
+  margin:12px 5px 4px;
+}
 .history{display:flex;flex-direction:column;gap:4px}
-.history button{border:0;background:transparent;color:#b7cbed;text-align:left;padding:10px 7px;border-radius:10px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.history button{
+  border:0;
+  background:transparent;
+  color:#c5d6f1;
+  text-align:left;
+  padding:10px 7px;
+  border-radius:10px;
+  font-size:12px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
 .history button:hover{background:#122849}
-.side-bottom{margin-top:auto;font-size:11px;color:#8098bb;text-align:center;padding:12px 0 0}
-.main{display:flex;flex-direction:column;gap:14px;min-width:0}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 5px}
+.side-bottom{
+  margin-top:auto;
+  font-size:11px;
+  color:#a3b8da;
+  text-align:center;
+  padding:12px 0 0;
+}
+
+/* MAIN CONTENT */
+.main{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-width:0;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 5px;
+}
 .topbrand{display:flex;align-items:center;gap:10px}
-.logo{width:45px;height:45px;border:1px solid #eacb8c;border-radius:50%;display:grid;place-items:center;font:29px Georgia;color:var(--gold);background:#0b1930}
-.topbrand strong{display:block;font:22px Georgia;color:var(--gold)}
+.logo{
+  width:45px;
+  height:45px;
+  border:1px solid #eacb8c;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font:29px Georgia;
+  color:var(--gold);
+  background:#0b1930eF;
+}
+.topbrand strong{
+  display:block;
+  font:22px Georgia;
+  color:var(--gold);
+}
 .small{font-size:11px;color:var(--muted);margin-top:5px}
 .actions{display:flex;align-items:center;gap:9px}
-.round{width:40px;height:40px;border-radius:50%;border:1px solid #568bff80;background:#07162f;color:#9fc5ff}
-.kanha{border:1px solid #568bff80;background:#0b1a35;border-radius:30px;padding:11px 14px;white-space:nowrap}
-.panel{display:flex;flex-direction:column;min-height:490px;flex:1;overflow:hidden}
-.panelhead{padding:17px 20px;border-bottom:1px solid #5279b62d;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.round{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:1px solid #568bff80;
+  background:#07162fee;
+  color:#9fc5ff;
+}
+.kanha{
+  border:1px solid #568bff80;
+  background:#0b1a35ed;
+  border-radius:30px;
+  padding:11px 14px;
+  white-space:nowrap;
+}
+.panel{
+  display:flex;
+  flex-direction:column;
+  min-height:490px;
+  flex:1;
+  overflow:hidden;
+}
+.panelhead{
+  padding:17px 20px;
+  border-bottom:1px solid #5279b644;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  background:#061126a8;
+}
 .panelhead strong{font-size:15px}
 .panelhead p{margin:5px 0 0;font-size:11px;color:var(--muted)}
-.chat{padding:20px;display:flex;flex-direction:column;gap:18px;flex:1;min-height:290px;max-height:54vh;overflow-y:auto;scroll-behavior:smooth}
-.day{text-align:center;font-size:11px;color:#c5d5ee;background:#12274a99;border:1px solid #5279b633;border-radius:25px;padding:8px 15px;align-self:center}
-.msg{max-width:84%;display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+
+/* CHAT */
+.chat{
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  flex:1;
+  min-height:290px;
+  max-height:54vh;
+  overflow-y:auto;
+  scroll-behavior:smooth;
+}
+.day{
+  text-align:center;
+  font-size:11px;
+  color:#d4e2fa;
+  background:#12274acc;
+  border:1px solid #5279b655;
+  border-radius:25px;
+  padding:8px 15px;
+  align-self:center;
+}
+.msg{
+  max-width:84%;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  align-items:flex-start;
+}
 .msg.user{align-self:flex-end;align-items:flex-end}
-.who{font-size:11px;color:#9cc3ff;padding:0 5px}
-.bubble{padding:13px 16px;border:1px solid #6489bf50;background:linear-gradient(140deg,#102443ed,#07142bed);border-radius:17px 17px 17px 5px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
-.user .bubble{background:linear-gradient(140deg,#174dd0,#092a84);border-color:#80acff55;border-radius:17px 17px 5px 17px}
-.time{font-size:10px;color:#91addb;padding:0 5px}
-.typing{display:none;padding:0 20px 13px;align-items:center;gap:9px;color:#9db8e4;font-size:12px}
+.who{font-size:11px;color:#b0ceff;padding:0 5px}
+.bubble{
+  padding:13px 16px;
+  border:1px solid #6489bf70;
+  background:linear-gradient(140deg,#102443f5,#07142bf5);
+  border-radius:17px 17px 17px 5px;
+  line-height:1.65;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font-size:14px;
+}
+.user .bubble{
+  background:linear-gradient(140deg,#174dd0f5,#092a84f5);
+  border-color:#80acff80;
+  border-radius:17px 17px 5px 17px;
+}
+.time{font-size:10px;color:#b0c7eb;padding:0 5px}
+
+.typing{
+  display:none;
+  padding:0 20px 13px;
+  align-items:center;
+  gap:9px;
+  color:#c0d4f5;
+  font-size:12px;
+}
 .typing.show{display:flex}
-.dots{display:flex;gap:4px}.dots i{width:7px;height:7px;border-radius:50%;background:#75b9ff;animation:blink .7s infinite alternate}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
-@keyframes blink{to{opacity:.2;transform:translateY(-3px)}}
-.composer-wrap{padding:14px 17px 18px;border-top:1px solid #5b80bb30}
-.composer{display:flex;align-items:center;gap:8px;border:1px solid #568cff;background:#07152ef5;border-radius:35px;padding:7px 9px 7px 17px;box-shadow:0 0 18px #1d62ff1a}
-.composer input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:white;padding:10px 0;font-size:14px}
-.composer input::placeholder{color:#8ba8d8}
-.tool{width:37px;height:37px;flex-shrink:0;border:0;background:transparent;color:#9cc4ff;font-size:20px;border-radius:50%}
-.send{width:48px;height:48px;border-radius:50%;background:linear-gradient(140deg,#4087ff,#1248e5);color:white;border:1px solid #82b1ff;box-shadow:0 0 19px #2165ff66;font-size:23px}
+.dots{display:flex;gap:4px}
+.dots i{
+  width:7px;height:7px;border-radius:50%;
+  background:#75b9ff;
+  animation:blink .7s infinite alternate;
+}
+.dots i:nth-child(2){animation-delay:.2s}
+.dots i:nth-child(3){animation-delay:.4s}
+@keyframes blink{
+  to{opacity:.2;transform:translateY(-3px)}
+}
+
+/* MESSAGE INPUT */
+.composer-wrap{
+  padding:14px 17px 18px;
+  border-top:1px solid #5b80bb50;
+  background:#030b1cc9;
+}
+.composer{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid #568cff;
+  background:#07152ef5;
+  border-radius:35px;
+  padding:7px 9px 7px 17px;
+  box-shadow:0 0 18px #1d62ff25;
+}
+.composer input{
+  flex:1;
+  min-width:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:white;
+  padding:10px 0;
+  font-size:14px;
+}
+.composer input::placeholder{color:#a6bce1}
+.tool{
+  width:37px;
+  height:37px;
+  flex-shrink:0;
+  border:0;
+  background:transparent;
+  color:#9cc4ff;
+  font-size:20px;
+  border-radius:50%;
+}
+.send{
+  width:48px;
+  height:48px;
+  flex-shrink:0;
+  border-radius:50%;
+  background:linear-gradient(140deg,#4087ff,#1248e5);
+  color:white;
+  border:1px solid #82b1ff;
+  box-shadow:0 0 19px #2165ff66;
+  font-size:23px;
+}
 .send:hover{filter:brightness(1.18)}
-.features{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.feature{background:linear-gradient(150deg,#030b1cf2,#061329ed);border:1px solid #537cbf80;border-radius:17px;text-align:center;padding:20px 9px;color:white;min-width:0}
-.feature:hover{border-color:#8bb5ff;box-shadow:0 0 20px #2a6bff22}
-.fi{font-size:29px;color:#7eaaff;text-shadow:0 0 14px #4787ff;margin-bottom:10px}
-.feature b{display:block;color:#ffe5b6;font-size:12px;letter-spacing:.6px}
-.feature p{font-size:11px;color:#b8c9e5;line-height:1.5;margin:8px 0 0}
-.footer{text-align:center;color:#d3d6e7;font:12px Georgia;letter-spacing:2px;padding:4px 0 8px}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:none;background:#10274a;border:1px solid #568bff;padding:12px 18px;border-radius:13px;z-index:5;max-width:90%;font-size:13px}
+
+/* FEATURE CARDS */
+.features{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.feature{
+  background:rgba(3,11,28,.88);
+  border:1px solid #537cbf99;
+  border-radius:17px;
+  text-align:center;
+  padding:20px 9px;
+  color:white;
+  min-width:0;
+  transition:.2s;
+}
+.feature:hover{
+  border-color:#8bb5ff;
+  box-shadow:0 0 20px #2a6bff30;
+  transform:translateY(-2px);
+}
+.fi{
+  font-size:29px;
+  color:#7eaaff;
+  text-shadow:0 0 14px #4787ff;
+  margin-bottom:10px;
+}
+.feature b{
+  display:block;
+  color:#ffe5b6;
+  font-size:12px;
+  letter-spacing:.6px;
+}
+.feature p{
+  font-size:11px;
+  color:#c8d7ef;
+  line-height:1.5;
+  margin:8px 0 0;
+}
+.footer{
+  text-align:center;
+  color:#e1e7f5;
+  font:12px Georgia;
+  letter-spacing:2px;
+  padding:4px 0 8px;
+}
+.toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  display:none;
+  background:#10274a;
+  border:1px solid #568bff;
+  padding:12px 18px;
+  border-radius:13px;
+  z-index:5;
+  max-width:90%;
+  font-size:13px;
+}
 .toast.show{display:block}
-@media(min-width:1100px){.panel{min-height:510px}}
+
+@media(min-width:1100px){
+  .panel{min-height:510px}
+}
 @media(max-width:850px){
- .app{grid-template-columns:1fr;padding:9px;gap:10px}
- .sidebar{min-height:0;padding:13px;gap:10px}
- .brand{font-size:31px}.brand span{font-size:20px}
- .side-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
- .btn{flex-direction:column;justify-content:center;gap:5px;padding:9px 2px;font-size:11px;text-align:center}
- .history,.side-bottom{display:none}
- .new{margin-top:0;justify-content:center;flex-direction:row;font-size:13px}
- .main{gap:10px}
- .topbrand strong{font-size:18px}
- .panel{min-height:450px}
- .chat{padding:14px;max-height:48vh}
- .msg{max-width:94%}
- .features{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
- .feature{padding:15px 6px}
- .moon{width:69px;height:69px;top:12%;left:67%}
- .panelhead{padding:13px}
+  .app{
+    grid-template-columns:1fr;
+    padding:9px;
+    gap:10px;
+  }
+  .sidebar{min-height:0;padding:13px;gap:10px}
+  .brand{font-size:31px}
+  .brand span{font-size:20px}
+  .side-nav{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:3px;
+  }
+  .btn{
+    flex-direction:column;
+    justify-content:center;
+    gap:5px;
+    padding:9px 2px;
+    font-size:11px;
+    text-align:center;
+  }
+  .history,.side-bottom{display:none}
+  .new{
+    margin-top:0;
+    text-align:center;
+    font-size:13px;
+  }
+  .main{gap:10px}
+  .topbrand strong{font-size:18px}
+  .panel{min-height:450px}
+  .chat{padding:14px;max-height:52vh}
+  .msg{max-width:94%}
+  .features{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .feature{padding:15px 6px}
+  .panelhead{padding:13px}
 }
 @media(max-width:390px){
- .app{padding:6px}
- .kanha{padding:9px;font-size:12px}
- .topbrand strong{font-size:16px}
- .small{font-size:10px}
- .logo{width:38px;height:38px}
- .composer-wrap{padding:10px}
- .tool{width:30px}
- .send{width:40px;height:40px}
- .footer{font-size:9px;letter-spacing:1px}
+  .app{padding:6px}
+  .kanha{padding:9px;font-size:12px}
+  .topbrand strong{font-size:16px}
+  .small{font-size:10px}
+  .logo{width:38px;height:38px}
+  .composer-wrap{padding:10px}
+  .tool{width:30px}
+  .send{width:40px;height:40px}
+  .footer{font-size:9px;letter-spacing:1px}
 }
 </style>
 </head>
+
 <body>
 <div class="scene" aria-hidden="true">
- <div class="sky"></div><div class="stars"></div><div class="moon"></div>
- <div class="arch left"></div><div class="arch right"></div>
- <div class="lights"></div><div class="water"><div class="reflection"></div></div>
- <div class="lotus">✿</div><div class="lotus two">✿</div><div class="lotus three">✿</div>
+  <div class="sky"></div>
+  <div class="stars"></div>
+  <div class="moon"></div>
+  <div class="arch left"></div>
+  <div class="arch right"></div>
+  <div class="lights"></div>
+  <div class="water"><div class="reflection"></div></div>
+  <div class="lotus">✿</div>
+  <div class="lotus two">✿</div>
+  <div class="lotus three">✿</div>
 </div>
 
 <div class="app">
- <aside class="sidebar glass">
-  <div class="brand">RADHA <span>AI</span></div>
-  <div class="tagline">Always with you, Kanha... ♡</div>
-  <button class="new" id="newChat">＋ &nbsp; New Chat</button>
-  <nav class="side-nav">
-   <button class="btn active" data-page="Chats">▣ <span>Chats</span></button>
-   <button class="btn" data-page="Explore">✧ <span>Explore</span></button>
-   <button class="btn" data-page="Voice Chat">♬ <span>Voice Chat</span></button>
-   <button class="btn" data-page="Memory">❋ <span>Memory</span></button>
-  </nav>
-  <button class="btn" data-page="Settings">⚙ <span>Settings</span></button>
-  <div class="label">RECENT CHATS</div>
-  <div class="history" id="history"></div>
-  <div class="side-bottom">Made with care for Kanha 💙</div>
- </aside>
+  <aside class="sidebar glass">
+    <div class="brand">RADHA <span>AI</span></div>
+    <div class="tagline">Always with you, Kanha... ♡</div>
 
- <main class="main">
-  <header class="topbar">
-   <div class="topbrand"><div class="logo">R</div><div>
-    <strong>RADHA AI</strong>
-    <div class="small">Your personal assistant · Always with you, Kanha...</div>
-   </div></div>
-   <div class="actions">
-    <button class="round" id="theme" aria-label="Change brightness">☾</button>
-    <div class="kanha">● &nbsp; Kanha 💙</div>
-   </div>
-  </header>
+    <button class="new" id="newChat">＋ &nbsp; New Chat</button>
 
-  <section class="panel glass">
-   <div class="panelhead"><div><strong id="heading">Your little corner, Kanha 💙</strong><p id="subheading">A peaceful place to talk</p></div></div>
-   <div class="chat" id="chat" aria-live="polite"></div>
-   <div class="typing" id="typing"><div class="dots"><i></i><i></i><i></i></div> Radha is thinking...</div>
-   <div class="composer-wrap">
-    <form class="composer" id="form">
-     <button class="tool" type="button" id="attach" aria-label="Attach">＋</button>
-     <input id="message" placeholder="Message RADHA, Kanha..." autocomplete="off" required>
-     <button class="tool" type="button" id="voice" aria-label="Voice input">♩</button>
-     <button class="send" type="submit" aria-label="Send">➤</button>
-    </form>
-   </div>
-  </section>
+    <nav class="side-nav">
+      <button class="btn active" data-page="Chats">▣ <span>Chats</span></button>
+      <button class="btn" data-page="Explore">✧ <span>Explore</span></button>
+      <button class="btn" data-page="Voice Chat">♬ <span>Voice Chat</span></button>
+      <button class="btn" data-page="Memory">❋ <span>Memory</span></button>
+    </nav>
 
-  <section class="features">
-   <button class="feature" data-page="Chats"><div class="fi">☏</div><b>INTELLIGENT CHAT</b><p>Natural conversations<br>with RADHA</p></button>
-   <button class="feature" data-page="Voice Chat"><div class="fi">♩</div><b>VOICE CHAT</b><p>Talk to RADHA<br>like a real friend</p></button>
-   <button class="feature" data-page="Memory"><div class="fi">❋</div><b>MEMORY</b><p>Keep your chats<br>on this device</p></button>
-   <button class="feature" data-page="Explore"><div class="fi">★</div><b>IDEAS & EXPLORE</b><p>Discover ideas<br>and more</p></button>
-  </section>
-  <footer class="footer">SOME CONVERSATIONS FEEL LIKE HOME... ♡</footer>
- </main>
+    <button class="btn" data-page="Settings">⚙ <span>Settings</span></button>
+
+    <div class="label">RECENT CHATS</div>
+    <div class="history" id="history"></div>
+    <div class="side-bottom">Made with care for Kanha 💙</div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbrand">
+        <div class="logo">R</div>
+        <div>
+          <strong>RADHA AI</strong>
+          <div class="small">Your personal assistant · Always with you, Kanha...</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="round" id="theme" aria-label="Change brightness">☾</button>
+        <div class="kanha">● &nbsp; Kanha 💙</div>
+      </div>
+    </header>
+
+    <section class="panel glass">
+      <div class="panelhead">
+        <div>
+          <strong id="heading">Your little corner, Kanha 💙</strong>
+          <p id="subheading">A peaceful place to talk</p>
+        </div>
+      </div>
+
+      <div class="chat" id="chat" aria-live="polite"></div>
+
+      <div class="typing" id="typing">
+        <div class="dots"><i></i><i></i><i></i></div>
+        Radha is thinking...
+      </div>
+
+      <div class="composer-wrap">
+        <form class="composer" id="form">
+          <button class="tool" type="button" id="attach" aria-label="Attach">＋</button>
+          <input id="message" placeholder="Message RADHA, Kanha..." autocomplete="off" required>
+          <button class="tool" type="button" id="voice" aria-label="Voice input">♩</button>
+          <button class="send" type="submit" aria-label="Send">➤</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="features">
+      <button class="feature" data-page="Chats">
+        <div class="fi">☏</div>
+        <b>INTELLIGENT CHAT</b>
+        <p>Natural conversations<br>with RADHA</p>
+      </button>
+      <button class="feature" data-page="Voice Chat">
+        <div class="fi">♩</div>
+        <b>VOICE CHAT</b>
+        <p>Talk to RADHA<br>like a real friend</p>
+      </button>
+      <button class="feature" data-page="Memory">
+        <div class="fi">❋</div>
+        <b>MEMORY</b>
+        <p>Keep your chats<br>on this device</p>
+      </button>
+      <button class="feature" data-page="Explore">
+        <div class="fi">★</div>
+        <b>IDEAS & EXPLORE</b>
+        <p>Discover ideas<br>and more</p>
+      </button>
+    </section>
+
+    <footer class="footer">SOME CONVERSATIONS FEEL LIKE HOME... ♡</footer>
+  </main>
 </div>
-<div class="toast" id="toast"></div>
+
+<div class="toast" id="toast" role="status"></div>
 
 <script>
 const chat = document.getElementById("chat");
 const form = document.getElementById("form");
 const input = document.getElementById("message");
 const typing = document.getElementById("typing");
+const historyBox = document.getElementById("history");
+const toast = document.getElementById("toast");
 
 let messages = [];
+let toastTimer;
 
-function addMessage(text, sender) {
+function showToast(text) {
+  toast.textContent = text;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 2500);
+}
+
+function saveMessages() {
+  try {
+    localStorage.setItem("radha-current", JSON.stringify(messages));
+  } catch (error) {
+    showToast("Unable to save chats on this device.");
+  }
+}
+
+function addMessage(text, sender, shouldSave = true) {
   const row = document.createElement("div");
   row.className = "msg " + (sender === "user" ? "user" : "bot");
 
@@ -203,18 +597,30 @@ function addMessage(text, sender) {
     minute: "2-digit"
   });
 
-  row.appendChild(name);
-  row.appendChild(bubble);
-  row.appendChild(time);
+  row.append(name, bubble, time);
   chat.appendChild(row);
-
   chat.scrollTop = chat.scrollHeight;
 
   messages.push({ text, sender });
 
-  try {
-    localStorage.setItem("radha-current", JSON.stringify(messages));
-  } catch (error) {}
+  if (shouldSave) saveMessages();
+  renderHistory();
+}
+
+function renderHistory() {
+  historyBox.replaceChildren();
+
+  if (!messages.length) return;
+
+  const recent = document.createElement("button");
+  const lastUserMessage = [...messages].reverse().find(m => m.sender === "user");
+  recent.textContent = "▢  " + (lastUserMessage ? lastUserMessage.text : "Welcome to RADHA");
+  recent.title = recent.textContent;
+  recent.addEventListener("click", () => {
+    chat.scrollTop = chat.scrollHeight;
+    input.focus();
+  });
+  historyBox.appendChild(recent);
 }
 
 function radhaReply(text) {
@@ -223,28 +629,33 @@ function radhaReply(text) {
   if (/^(hi|hello|hey|hii)\b/.test(message)) {
     return "Hey Kanha! 💙 I'm here. How are you today?";
   }
-
   if (message.includes("your name")) {
     return "I'm RADHA, your personal assistant, Kanha! 💙";
   }
-
   if (message.includes("time")) {
     return "It's " + new Date().toLocaleTimeString() + ", Kanha.";
   }
-
   if (message.includes("thank")) {
     return "You're welcome, Kanha! 💙";
   }
-
   if (message.includes("good morning")) {
     return "Good morning, Kanha! ☀️";
   }
-
   if (message.includes("good night")) {
     return "Good night, Kanha! 🌙";
   }
+  if (message.includes("who are you")) {
+    return "I'm RADHA, your personal assistant interface. 💙 My full AI connection is a future step.";
+  }
 
   return "I received your message, Kanha! 💙 My real AI brain isn't connected yet. We'll connect it in the next stage.";
+}
+
+function welcomeMessage() {
+  addMessage(
+    "Welcome back, Kanha! 💙\nI'm RADHA...\nWhat shall we talk about today?",
+    "bot"
+  );
 }
 
 form.addEventListener("submit", function(event) {
@@ -255,27 +666,25 @@ form.addEventListener("submit", function(event) {
 
   addMessage(text, "user");
   input.value = "";
-  input.focus();
-
   typing.classList.add("show");
 
   setTimeout(function() {
     typing.classList.remove("show");
     addMessage(radhaReply(text), "bot");
+    input.focus();
   }, 500);
 });
 
 document.getElementById("newChat").addEventListener("click", function() {
   chat.replaceChildren();
   messages = [];
+
   try {
     localStorage.removeItem("radha-current");
   } catch (error) {}
 
-  addMessage(
-    "Welcome back, Kanha! 💙\nI'm RADHA...\nWhat shall we talk about today?",
-    "bot"
-  );
+  welcomeMessage();
+  showToast("A fresh chat is ready, Kanha 💙");
 });
 
 document.getElementById("voice").addEventListener("click", function() {
@@ -283,40 +692,82 @@ document.getElementById("voice").addEventListener("click", function() {
                  window.webkitSpeechRecognition;
 
   if (!Speech) {
-    alert("Voice input is not supported in this browser.");
+    showToast("Voice input isn't supported in this browser.");
     return;
   }
 
   const recognition = new Speech();
   recognition.lang = "en-IN";
+  recognition.interimResults = false;
 
   recognition.onresult = function(event) {
     input.value = event.results[0][0].transcript;
     input.focus();
   };
 
+  recognition.onerror = function() {
+    showToast("Voice input stopped. Please try again.");
+  };
+
   recognition.start();
 });
 
-try {
-  const saved = JSON.parse(
-    localStorage.getItem("radha-current") || "[]"
-  );
+document.getElementById("attach").addEventListener("click", function() {
+  showToast("Attachments will be added in a future update.");
+});
 
-  if (Array.isArray(saved)) {
+document.getElementById("theme").addEventListener("click", function() {
+  document.body.classList.toggle("bright");
+  const bright = document.body.classList.contains("bright");
+  document.getElementById("theme").textContent = bright ? "☀" : "☾";
+  showToast(bright ? "Soft brightness enabled." : "Night mode enabled.");
+});
+
+document.querySelectorAll("[data-page]").forEach(function(button) {
+  button.addEventListener("click", function() {
+    const page = button.dataset.page;
+
+    document.querySelectorAll(".side-nav .btn").forEach(function(item) {
+      item.classList.toggle("active", item.dataset.page === page);
+    });
+
+    if (page === "Chats") {
+      document.getElementById("heading").textContent = "Your little corner, Kanha 💙";
+      document.getElementById("subheading").textContent = "A peaceful place to talk";
+      chat.scrollTop = chat.scrollHeight;
+    } else {
+      document.getElementById("heading").textContent = page + " ✨";
+      document.getElementById("subheading").textContent =
+        page === "Memory" ? "Your saved messages stay on this device" :
+        page === "Voice Chat" ? "Use the microphone button to speak" :
+        page === "Settings" ? "RADHA preferences" :
+        "A new part of RADHA, coming soon";
+      showToast(page + " selected");
+    }
+
+    if (page === "Voice Chat") input.focus();
+  });
+});
+
+/* Restore the previous conversation without duplicating it */
+try {
+  const saved = JSON.parse(localStorage.getItem("radha-current") || "[]");
+
+  if (Array.isArray(saved) && saved.length) {
     saved.forEach(function(item) {
-      if (item && typeof item.text === "string") {
+      if (item && typeof item.text === "string" &&
+          (item.sender === "user" || item.sender === "bot")) {
         addMessage(item.text, item.sender, false);
       }
     });
   }
-} catch (error) {}
+} catch (error) {
+  messages = [];
+}
 
-addMessage(
-  "Welcome back, Kanha! 💙\nI'm RADHA...\nWhat shall we talk about today?",
-  "bot"
-);
-</script> 
+if (!messages.length) welcomeMessage();
+renderHistory();
+</script>
 </body>
-</html>
- 
+ </html>
+         
