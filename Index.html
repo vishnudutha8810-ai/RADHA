@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADHA AI</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #080d18;
+      color: #eaf2ff;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      padding: 22px;
+      text-align: center;
+      border-bottom: 1px solid #233550;
+    }
+    header h1 {
+      margin: 0;
+      color: #68baff;
+      letter-spacing: 5px;
+    }
+    header p { color: #8ca5c8; }
+    #chat {
+      padding: 18px;
+      height: 65vh;
+      overflow-y: auto;
+    }
+    .msg {
+      padding: 12px 15px;
+      margin: 12px 0;
+      border-radius: 14px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .bot {
+      background: #15253c;
+      border: 1px solid #294b70;
+    }
+    .user {
+      background: #124c78;
+      margin-left: 15%;
+    }
+    form {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #080d18;
+    }
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #345070;
+      background: #111d30;
+      color: white;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 12px;
+      background: #1689dc;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>RADHA</h1>
+    <p>Your Personal AI Assistant</p>
+  </header>
+
+  <main id="chat" aria-live="polite">
+    <div class="msg bot">
+      Hello! I am RADHA.
+
+      Your personal assistant starts here.
+      Type "help" to see available commands.
+    </div>
+  </main>
+
+  <form id="form">
+    <input id="message" placeholder="Message RADHA..."
+      autocomplete="off" required>
+    <button type="submit">Send</button>
+  </form>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const form = document.getElementById("form");
+    const input = document.getElementById("message");
+
+    function addMessage(text, type) {
+      const div = document.createElement("div");
+      div.className = "msg " + type;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      const message = input.value.trim();
+      if (!message) return;
+
+      addMessage(message, "user");
+      input.value = "";
+
+      const text = message.toLowerCase();
+      let reply;
+
+      if (text === "hi" || text === "hello" ||
+          text === "hey") {
+        reply = "Hello! Welcome to RADHA.";
+      } else if (text === "help") {
+        reply = "Available commands: hi, hello, help, time.";
+      } else if (text === "time") {
+        reply = "Your device time is " +
+          new Date().toLocaleTimeString();
+      } else {
+        reply = "I received your message! Real AI responses " +
+          "will be connected in the next development step.";
+      }
+
+      addMessage(reply, "bot");
+    });
+  </script>
+</body>
+</html>
+  
