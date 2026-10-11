@@ -53,12 +53,17 @@ input:focus-visible {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
+
+  background-image:
     linear-gradient(
       rgba(2, 7, 21, .12),
       rgba(2, 7, 21, .18)
     ),
-    url("./file_00000000511082118751e602b7e80417.png") center center / cover no-repeat;
+    url("./file_00000000511082118751e602b7e80417.png");
+
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .scene::after {
