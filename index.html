@@ -177,129 +177,146 @@ button:focus-visible,input:focus-visible{outline:2px solid #80b8ff;outline-offse
 <div class="toast" id="toast"></div>
 
 <script>
-(function(){
-"use strict";
-const $=id=>document.getElementById(id);
-const chat=$("chat"), input=$("message");
-let messages=[], chats=[];
-let toastTimer=null, replyTimer=null;
+const chat = document.getElementById("chat");
+const form = document.getElementById("form");
+const input = document.getElementById("message");
+const typing = document.getElementById("typing");
 
-function toast(text){
- const el=$("toast");el.textContent=text;el.classList.add("show");
- clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2500);
+let messages = [];
+
+function addMessage(text, sender) {
+  const row = document.createElement("div");
+  row.className = "msg " + (sender === "user" ? "user" : "bot");
+
+  const name = document.createElement("div");
+  name.className = "who";
+  name.textContent = sender === "user" ? "Kanha 💙" : "✧ RADHA";
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
+
+  const time = document.createElement("div");
+  time.className = "time";
+  time.textContent = new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  row.appendChild(name);
+  row.appendChild(bubble);
+  row.appendChild(time);
+  chat.appendChild(row);
+
+  chat.scrollTop = chat.scrollHeight;
+
+  messages.push({ text, sender });
+
+  try {
+    localStorage.setItem("radha-current", JSON.stringify(messages));
+  } catch (error) {}
 }
-function timeNow(){return new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});}
-function addBubble(text,role,save=true){
- const row=document.createElement("div");
- row.className="msg "+(role==="user"?"user":"bot");
- const who=document.createElement("div");who.className="who";
- who.textContent=role==="user"?"Kanha 💙":"✧ RADHA";
- const bubble=document.createElement("div");bubble.className="bubble";
- bubble.textContent=text;
- const time=document.createElement("div");time.className="time";time.textContent=timeNow();
- row.append(who,bubble,time);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;
- messages.push({role,text,at:Date.now()});
- if(save)saveAll();
-}
-function welcome(save=false){
- addBubble("Welcome back, Kanha! 💙\nI'm RADHA...\nWhat shall we talk about today?","bot",save);
-}
-function saveAll(){
- try{
-  localStorage.setItem("radha-current",JSON.stringify(messages));
-  const old=JSON.parse(localStorage.getItem("radha-chats")||"[]");
-  const first=messages.find(m=>m.role==="user");
-  if(first){
-   const title=first.text.slice(0,28);
-   chats=[{title,messages:messages.slice(),at:Date.now()},...old.filter(c=>c.title!==title)].slice(0,8);
-   localStorage.setItem("radha-chats",JSON.stringify(chats));
+
+function radhaReply(text) {
+  const message = text.toLowerCase().trim();
+
+  if (/^(hi|hello|hey|hii)\b/.test(message)) {
+    return "Hey Kanha! 💙 I'm here. How are you today?";
   }
-  renderHistory();
- }catch(e){}
+
+  if (message.includes("your name")) {
+    return "I'm RADHA, your personal assistant, Kanha! 💙";
+  }
+
+  if (message.includes("time")) {
+    return "It's " + new Date().toLocaleTimeString() + ", Kanha.";
+  }
+
+  if (message.includes("thank")) {
+    return "You're welcome, Kanha! 💙";
+  }
+
+  if (message.includes("good morning")) {
+    return "Good morning, Kanha! ☀️";
+  }
+
+  if (message.includes("good night")) {
+    return "Good night, Kanha! 🌙";
+  }
+
+  return "I received your message, Kanha! 💙 My real AI brain isn't connected yet. We'll connect it in the next stage.";
 }
-function renderHistory(){
- const el=$("history");el.replaceChildren();
- try{chats=JSON.parse(localStorage.getItem("radha-chats")||"[]");}catch(e){chats=[];}
- chats.forEach((c,i)=>{
-  const b=document.createElement("button");b.textContent="☏  "+c.title;
-  b.onclick=()=>{clearTimeout(replyTimer);messages=[];chat.replaceChildren();(c.messages||[]).forEach(m=>addBubble(m.text,m.role,false));$("heading").textContent=c.title;$("subheading").textContent="Previous conversation";toast("Chat opened, Kanha.");};
-  el.appendChild(b);
- });
-}
-function answer(text){
- const t=text.toLowerCase();
- if(/^(hi|hello|hey|hii|namaste)\b/.test(t))return "Hey Kanha! 💙 I'm here. How are you today?";
- if(t.includes("your name")||t.includes("who are you"))return "I'm RADHA, your personal assistant, Kanha. 💙";
- if(t.includes("time"))return "It's "+new Date().toLocaleTimeString()+", Kanha.";
- if(t.includes("date"))return "Today is "+new Date().toLocaleDateString()+", Kanha.";
- if(t.includes("thank"))return "You're welcome, Kanha! 💙";
- if(t.includes("good morning"))return "Good morning, Kanha! ☀️ Let's make today a good one.";
- if(t.includes("good night"))return "Good night, Kanha. 🌙 Take care!";
- if(t.includes("help"))return "I'm ready to chat, Kanha. My interface works, but a real AI service still needs to be connected for intelligent answers.";
- if(t.includes("who am i"))return "You're Kanha! 💙 That's the name you've chosen for yourself in RADHA.";
- if(t.includes("bye"))return "See you again, Kanha! 💙";
- return "I got your message, Kanha. 💙\n\nMy chat interface is working, but I don't have a real AI brain connected yet. Once we connect an AI backend, I'll be able to answer questions properly.";
-}
-function send(text){
- text=text.trim();if(!text)return;
- clearTimeout(replyTimer);
- $("heading").textContent="Your little corner, Kanha 💙";
- $("subheading").textContent="A peaceful place to talk";
- addBubble(text,"user");
- input.value="";input.focus();
- $("typing").classList.add("show");
- replyTimer=setTimeout(()=>{
-  $("typing").classList.remove("show");
-  addBubble(answer(text),"bot");
- },350);
-}
-$("form").addEventListener("submit",function(e){
- e.preventDefault();
- send(input.value);
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage(text, "user");
+  input.value = "";
+  input.focus();
+
+  typing.classList.add("show");
+
+  setTimeout(function() {
+    typing.classList.remove("show");
+    addMessage(radhaReply(text), "bot");
+  }, 500);
 });
-$("newChat").addEventListener("click",function(){
- clearTimeout(replyTimer);$("typing").classList.remove("show");
- if(messages.some(m=>m.role==="user"))saveAll();
- messages=[];chat.replaceChildren();
- $("heading").textContent="Your little corner, Kanha 💙";
- $("subheading").textContent="A peaceful place to talk";
- welcome();input.focus();toast("New chat started, Kanha.");
+
+document.getElementById("newChat").addEventListener("click", function() {
+  chat.replaceChildren();
+  messages = [];
+  try {
+    localStorage.removeItem("radha-current");
+  } catch (error) {}
+
+  addMessage(
+    "Welcome back, Kanha! 💙\nI'm RADHA...\nWhat shall we talk about today?",
+    "bot"
+  );
 });
-document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",function(){
- const p=this.dataset.page;
- document.querySelectorAll(".side-nav .btn").forEach(n=>n.classList.toggle("active",n.dataset.page===p));
- if(p==="Chats"){toast("You're in chat, Kanha.");input.focus();}
- else if(p==="Voice Chat")toast("Tap the voice button to try speaking.");
- else if(p==="Memory")toast("Recent chats are stored in this browser when available.");
- else if(p==="Settings")toast("Use the moon button to change brightness.");
- else if(p==="Explore")toast("Send a question or idea to start exploring.");
-}));
-$("attach").addEventListener("click",()=>toast("Attachments will be added later, Kanha."));
-$("voice").addEventListener("click",function(){
- const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(!SR){toast("Voice input is not supported in this browser.");return;}
- const r=new SR();r.lang="en-IN";r.interimResults=false;
- r.onstart=()=>toast("Listening, Kanha...");
- r.onresult=e=>{input.value=e.results[0][0].transcript;input.focus();};
- r.onerror=()=>toast("Couldn't hear that. Try again.");
- r.start();
+
+document.getElementById("voice").addEventListener("click", function() {
+  const Speech = window.SpeechRecognition ||
+                 window.webkitSpeechRecognition;
+
+  if (!Speech) {
+    alert("Voice input is not supported in this browser.");
+    return;
+  }
+
+  const recognition = new Speech();
+  recognition.lang = "en-IN";
+
+  recognition.onresult = function(event) {
+    input.value = event.results[0][0].transcript;
+    input.focus();
+  };
+
+  recognition.start();
 });
-$("theme").addEventListener("click",()=>{
- document.body.classList.toggle("bright");
- document.body.style.filter=document.body.classList.contains("bright")?"brightness(1.18)":"";
- $("theme").textContent=document.body.classList.contains("bright")?"☀":"☾";
-});
-function load(){
- try{
-  const old=JSON.parse(localStorage.getItem("radha-current")||"[]");
-  if(Array.isArray(old))old.forEach(m=>addBubble(m.text,m.role,false));
- }catch(e){}
- welcome(false);
- renderHistory();
-}
-load();
-})();
-</script>
+
+try {
+  const saved = JSON.parse(
+    localStorage.getItem("radha-current") || "[]"
+  );
+
+  if (Array.isArray(saved)) {
+    saved.forEach(function(item) {
+      if (item && typeof item.text === "string") {
+        addMessage(item.text, item.sender, false);
+      }
+    });
+  }
+} catch (error) {}
+
+addMessage(
+  "Welcome back, Kanha! 💙\nI'm RADHA...\nWhat shall we talk about today?",
+  "bot"
+);
+</script> 
 </body>
 </html>
  
