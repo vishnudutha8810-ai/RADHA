@@ -1,139 +1,712 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RADHA AI</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: #080d18;
-      color: #eaf2ff;
-      font-family: Arial, sans-serif;
-    }
-    header {
-      padding: 22px;
-      text-align: center;
-      border-bottom: 1px solid #233550;
-    }
-    header h1 {
-      margin: 0;
-      color: #68baff;
-      letter-spacing: 5px;
-    }
-    header p { color: #8ca5c8; }
-    #chat {
-      padding: 18px;
-      height: 65vh;
-      overflow-y: auto;
-    }
-    .msg {
-      padding: 12px 15px;
-      margin: 12px 0;
-      border-radius: 14px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-    .bot {
-      background: #15253c;
-      border: 1px solid #294b70;
-    }
-    .user {
-      background: #124c78;
-      margin-left: 15%;
-    }
-    form {
-      display: flex;
-      gap: 8px;
-      padding: 12px;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #080d18;
-    }
-    input {
-      flex: 1;
-      min-width: 0;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid #345070;
-      background: #111d30;
-      color: white;
-      font-size: 16px;
-    }
-    button {
-      padding: 12px 16px;
-      border: 0;
-      border-radius: 12px;
-      background: #1689dc;
-      color: white;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050b19">
+<title>RADHA AI — Your Personal Assistant</title>
+
+<style>
+:root {
+  --bg: #050b19;
+  --panel: rgba(5, 14, 32, .91);
+  --panel2: rgba(15, 30, 57, .88);
+  --blue: #3478ff;
+  --light: #83b9ff;
+  --gold: #f4d39a;
+  --text: #f0f5ff;
+  --muted: #a0b3d4;
+  --border: rgba(115, 160, 255, .23);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 80% 10%, #19376a 0%, transparent 30%),
+    radial-gradient(ellipse at 15% 80%, #14264c 0%, transparent 35%),
+    linear-gradient(145deg, #020611, #08152b 55%, #030817);
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+button, input { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--light);
+  outline-offset: 3px;
+}
+#stars {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #c9ddff;
+  box-shadow: 0 0 7px #82aaff;
+}
+.moon {
+  position: fixed;
+  z-index: -1;
+  width: 100px;
+  height: 100px;
+  right: 9%;
+  top: 7%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%,
+    #fff9df, #f6dfad 50%, #c4b4a0 78%, #6d7c9d);
+  box-shadow: 0 0 35px #8abaff66, 0 0 100px #417bff30;
+  opacity: .94;
+}
+.app {
+  display: grid;
+  grid-template-columns: 255px minmax(0, 1fr);
+  gap: 18px;
+  max-width: 1500px;
+  min-height: 100vh;
+  padding: 18px;
+  margin: auto;
+}
+.sidebar, .chat-panel, .feature {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.sidebar {
+  border-radius: 23px;
+  padding: 20px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: calc(100vh - 36px);
+}
+.brand {
+  color: var(--gold);
+  font-family: Georgia, serif;
+  font-size: 30px;
+  letter-spacing: 1px;
+  text-align: center;
+  text-shadow: 0 0 18px #f4d39a45;
+  margin: 4px 0;
+}
+.brand span { color: var(--light); font-family: Arial, sans-serif; }
+.tagline {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  margin-top: -8px;
+}
+.nav-button, .history-button {
+  width: 100%;
+  text-align: left;
+  color: var(--muted);
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 12px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.nav-button:hover, .history-button:hover {
+  background: #152849;
+  color: white;
+}
+.nav-button.active {
+  background: linear-gradient(110deg, #1758d9, #122c70);
+  color: white;
+  border-color: #5b91ff70;
+  box-shadow: 0 0 22px #1b60ff25;
+}
+.section-label {
+  color: #8098bf;
+  font-size: 12px;
+  margin: 10px 10px 0;
+}
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.history-button {
+  padding: 9px;
+  font-size: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.new-chat {
+  margin-top: auto;
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #5688ff70;
+  border-radius: 30px;
+  color: white;
+  background: linear-gradient(110deg, #246bff, #102e83);
+}
+.new-chat:hover, .send:hover { filter: brightness(1.15); }
+.main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 5px;
+}
+.top-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.logo {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--gold);
+  border: 1px solid #e6c88c88;
+  font-family: Georgia, serif;
+  font-size: 27px;
+  background: #10203b;
+}
+.top-brand strong {
+  display: block;
+  color: var(--gold);
+  font-family: Georgia, serif;
+  font-size: 19px;
+}
+.status { color: var(--muted); font-size: 11px; margin-top: 3px; }
+.top-actions { display: flex; gap: 8px; align-items: center; }
+.icon-button {
+  border: 1px solid var(--border);
+  background: #0c1a31d9;
+  color: var(--light);
+  border-radius: 50%;
+  width: 39px;
+  height: 39px;
+}
+.kanha-pill {
+  padding: 9px 13px;
+  border-radius: 30px;
+  border: 1px solid #5188ff70;
+  color: #eaf2ff;
+  background: #10254c;
+  font-size: 13px;
+}
+.chat-panel {
+  border-radius: 23px;
+  flex: 1;
+  min-height: 390px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.chat-heading {
+  padding: 18px 20px 12px;
+  border-bottom: 1px solid #7ea6e51c;
+}
+.chat-heading h2 { margin: 0; font-size: 17px; font-weight: 600; }
+.chat-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+.chat {
+  padding: 20px;
+  flex: 1;
+  min-height: 250px;
+  max-height: 55vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  scroll-behavior: smooth;
+}
+.message-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 88%;
+  gap: 5px;
+}
+.message-row.user { align-self: flex-end; align-items: flex-end; }
+.sender { color: var(--light); font-size: 11px; padding: 0 5px; }
+.bubble {
+  border: 1px solid #6e9de52b;
+  background: linear-gradient(145deg, #142746, #0b172b);
+  border-radius: 17px 17px 17px 5px;
+  padding: 13px 15px;
+  font-size: 14px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.user .bubble {
+  background: linear-gradient(145deg, #205be1, #14358a);
+  border-color: #75a4ff45;
+  border-radius: 17px 17px 5px 17px;
+}
+.message-time { font-size: 10px; color: #8298bb; padding: 0 5px; }
+.typing {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 14px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.typing.show { display: flex; }
+.dots { display: flex; gap: 4px; }
+.dots i {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--light);
+  animation: pulse 1s infinite alternate;
+}
+.dots i:nth-child(2) { animation-delay: .2s; }
+.dots i:nth-child(3) { animation-delay: .4s; }
+@keyframes pulse { to { opacity: .25; transform: translateY(-3px); } }
+.composer-wrap {
+  padding: 13px 17px 18px;
+  border-top: 1px solid #7ea6e51c;
+}
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px 7px 15px;
+  border: 1px solid #5588ff80;
+  background: #071329ed;
+  border-radius: 30px;
+  box-shadow: 0 0 25px #1d5fff10;
+}
+.composer input {
+  min-width: 0;
+  flex: 1;
+  padding: 9px 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-size: 14px;
+}
+.composer input::placeholder { color: #839ac2; }
+.composer button {
+  flex-shrink: 0;
+  border: 0;
+  color: var(--light);
+  background: transparent;
+  font-size: 19px;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+.composer .send {
+  background: linear-gradient(140deg, #5795ff, #1550ed);
+  color: white;
+  box-shadow: 0 0 15px #246bff60;
+}
+.features {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.feature {
+  border-radius: 17px;
+  text-align: center;
+  padding: 17px 9px;
+  color: var(--text);
+  min-width: 0;
+  transition: transform .2s, border-color .2s;
+}
+.feature:hover { transform: translateY(-2px); border-color: #659bff80; }
+.feature-icon { font-size: 25px; color: #78aaff; margin-bottom: 7px; }
+.feature strong { display: block; font-size: 11px; letter-spacing: .7px; }
+.feature p { color: var(--muted); font-size: 11px; line-height: 1.5; margin: 6px 0 0; }
+.footer {
+  text-align: center;
+  color: #9bb1d4;
+  font-family: Georgia, serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 5px;
+}
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 25px;
+  transform: translateX(-50%);
+  max-width: 90%;
+  padding: 12px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #10213d;
+  color: white;
+  display: none;
+  z-index: 5;
+  font-size: 13px;
+}
+.toast.show { display: block; }
+@media (max-width: 800px) {
+  .app { grid-template-columns: 1fr; padding: 10px; gap: 10px; }
+  .sidebar {
+    min-height: auto;
+    padding: 12px;
+    gap: 10px;
+  }
+  .brand { font-size: 25px; }
+  .sidebar .nav-group { display: grid; grid-template-columns: repeat(4,1fr); gap: 4px; }
+  .nav-button { justify-content: center; flex-direction: column; gap: 4px; padding: 9px 3px; font-size: 11px; }
+  .history-section { display: none; }
+  .new-chat { margin-top: 0; }
+  .chat-panel { min-height: 440px; }
+  .chat { max-height: 48vh; padding: 14px; }
+  .message-row { max-width: 94%; }
+  .features { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+  .feature { padding: 14px 7px; }
+  .moon { width: 76px; height: 76px; right: 8%; top: 18%; }
+  .footer { letter-spacing: 1px; }
+}
+@media (max-width: 380px) {
+  .app { padding: 7px; }
+  .top-brand strong { font-size: 16px; }
+  .kanha-pill { padding: 8px; }
+  .chat-heading { padding: 14px; }
+  .composer-wrap { padding: 10px; }
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>RADHA</h1>
-    <p>Your Personal AI Assistant</p>
-  </header>
+<div id="stars"></div>
+<div class="moon" aria-hidden="true"></div>
 
-  <main id="chat" aria-live="polite">
-    <div class="msg bot">
-      Hello! I am RADHA.
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">✧ RADHA <span>AI</span></div>
+    <div class="tagline">Always with you, Kanha... ♡</div>
 
-      Your personal assistant starts here.
-      Type "help" to see available commands.
+    <div class="nav-group">
+      <button class="nav-button active" data-page="Chat">▣ <span>Chat</span></button>
+      <button class="nav-button" data-page="Explore">✧ <span>Explore</span></button>
+      <button class="nav-button" data-page="Voice Chat">♫ <span>Voice</span></button>
+      <button class="nav-button" data-page="Memory">❋ <span>Memory</span></button>
     </div>
+    <button class="nav-button" data-page="Settings">⚙ <span>Settings</span></button>
+
+    <div class="history-section">
+      <div class="section-label">RECENT CHATS</div>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+    <button class="new-chat" id="newChat">＋ New Chat</button>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="top-brand">
+        <div class="logo">R</div>
+        <div>
+          <strong>RADHA AI</strong>
+          <div class="status">Your personal assistant · Ready to chat</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-button" id="themeButton" aria-label="Toggle moon">☾</button>
+        <div class="kanha-pill">Kanha 💙</div>
+      </div>
+    </header>
+
+    <section class="chat-panel">
+      <div class="chat-heading">
+        <h2 id="chatTitle">A little corner for you, Kanha 💙</h2>
+        <p id="chatSubtitle">What's on your mind today?</p>
+      </div>
+
+      <div class="chat" id="chat" aria-live="polite"></div>
+
+      <div class="typing" id="typing">
+        <div class="dots"><i></i><i></i><i></i></div>
+        <span>RADHA is thinking...</span>
+      </div>
+
+      <div class="composer-wrap">
+        <form class="composer" id="chatForm">
+          <button type="button" id="attachButton" aria-label="Attach">＋</button>
+          <input id="messageInput" type="text"
+            placeholder="Message RADHA, Kanha..."
+            autocomplete="off" required>
+          <button type="button" id="voiceButton" aria-label="Voice input">🎙</button>
+          <button type="submit" class="send" aria-label="Send message">➤</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="features">
+      <button class="feature" data-page="Chat">
+        <div class="feature-icon">☏</div>
+        <strong>INTELLIGENT CHAT</strong>
+        <p>Chat and share your thoughts</p>
+      </button>
+      <button class="feature" data-page="Voice Chat">
+        <div class="feature-icon">🎙</div>
+        <strong>VOICE CHAT</strong>
+        <p>Talk using your microphone</p>
+      </button>
+      <button class="feature" data-page="Memory">
+        <div class="feature-icon">❋</div>
+        <strong>MEMORY</strong>
+        <p>Keep your chats on this device</p>
+      </button>
+      <button class="feature" data-page="Explore">
+        <div class="feature-icon">✦</div>
+        <strong>IDEAS & EXPLORE</strong>
+        <p>Discover ideas and possibilities</p>
+      </button>
+    </section>
+
+    <footer class="footer">SOME CONVERSATIONS FEEL LIKE HOME... ♡</footer>
   </main>
+</div>
 
-  <form id="form">
-    <input id="message" placeholder="Message RADHA..."
-      autocomplete="off" required>
-    <button type="submit">Send</button>
-  </form>
+<div class="toast" id="toast"></div>
 
-  <script>
-    const chat = document.getElementById("chat");
-    const form = document.getElementById("form");
-    const input = document.getElementById("message");
+<script>
+const $ = id => document.getElementById(id);
+const chat = $("chat");
+const input = $("messageInput");
+const STORAGE_KEY = "radha-chat-v1";
+const HISTORY_KEY = "radha-history-v1";
 
-    function addMessage(text, type) {
-      const div = document.createElement("div");
-      div.className = "msg " + type;
-      div.textContent = text;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
+let messages = [];
+let history = [];
+let toastTimer;
+
+function showToast(message) {
+  const toast = $("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+}
+
+function saveChat() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    if (messages.some(m => m.role === "user")) {
+      const first = messages.find(m => m.role === "user");
+      const title = first.text.slice(0, 30) || "New chat";
+      history = [{ title, messages }, ...history.filter(h => h.title !== title)].slice(0, 8);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
     }
+    renderHistory();
+  } catch (e) {
+    // Chat still works if browser storage is unavailable.
+  }
+}
 
-    form.addEventListener("submit", function(event) {
-      event.preventDefault();
-      const message = input.value.trim();
-      if (!message) return;
+function addMessage(text, role, persist = true) {
+  const row = document.createElement("div");
+  row.className = "message-row " + (role === "user" ? "user" : "bot");
 
-      addMessage(message, "user");
-      input.value = "";
+  const sender = document.createElement("div");
+  sender.className = "sender";
+  sender.textContent = role === "user" ? "Kanha" : "RADHA";
 
-      const text = message.toLowerCase();
-      let reply;
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
 
-      if (text === "hi" || text === "hello" ||
-          text === "hey") {
-        reply = "Hello! Welcome to RADHA.";
-      } else if (text === "help") {
-        reply = "Available commands: hi, hello, help, time.";
-      } else if (text === "time") {
-        reply = "Your device time is " +
-          new Date().toLocaleTimeString();
-      } else {
-        reply = "I received your message! Real AI responses " +
-          "will be connected in the next development step.";
-      }
+  const time = document.createElement("div");
+  time.className = "message-time";
+  time.textContent = new Date().toLocaleTimeString([], {
+    hour: "2-digit", minute: "2-digit"
+  });
 
-      addMessage(reply, "bot");
+  row.append(sender, bubble, time);
+  chat.appendChild(row);
+  chat.scrollTop = chat.scrollHeight;
+
+  messages.push({ role, text, time: Date.now() });
+  if (persist) saveChat();
+}
+
+function welcome() {
+  addMessage(
+    "Welcome back, Kanha! 💙\n\nI'm RADHA.\nWhat's on your mind today?",
+    "bot",
+    false
+  );
+}
+
+function renderHistory() {
+  const list = $("historyList");
+  list.replaceChildren();
+  try {
+    history = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+  } catch (e) { history = []; }
+
+  history.forEach(item => {
+    const button = document.createElement("button");
+    button.className = "history-button";
+    button.textContent = "☏  " + item.title;
+    button.addEventListener("click", () => {
+      messages = Array.isArray(item.messages) ? item.messages : [];
+      chat.replaceChildren();
+      messages.forEach(m => addMessage(m.text, m.role, false));
+      $("chatTitle").textContent = item.title;
+      $("chatSubtitle").textContent = "A previous conversation";
+      showToast("Chat opened on this device.");
     });
-  </script>
-</body>
-</html>
-  
+    list.appendChild(button);
+  });
+}
+
+function replyTo(text) {
+  const t = text.toLowerCase().trim();
+
+  if (/^(hi|hello|hey|hii|namaste)\b/.test(t))
+    return "Hey, Kanha! 💙 What's up?";
+  if (t.includes("your name") || t.includes("who are you"))
+    return "I'm RADHA, your personal chatbot. 💙";
+  if (t.includes("time"))
+    return "Your device time is " + new Date().toLocaleTimeString() + ".";
+  if (t === "help" || t.includes("what can you do"))
+    return "I'm still learning, Kanha! Right now I can respond to a few basic commands and keep chat history on this device. A real AI service needs to be connected for intelligent answers.";
+  if (t.includes("thank"))
+    return "You're welcome, Kanha! 💙";
+  if (t.includes("good morning"))
+    return "Good morning, Kanha! ☀️ Hope your day goes well.";
+  if (t.includes("good night"))
+    return "Good night, Kanha. 🌙 Rest well!";
+  if (t.includes("bye"))
+    return "See you again, Kanha! 💙";
+  return "I received your message, Kanha. 💙\n\nMy real AI brain isn't connected yet, so I can't answer this properly just yet. We can connect an AI backend in the next stage.";
+}
+
+function sendMessage(text) {
+  text = text.trim();
+  if (!text) return;
+
+  $("chatTitle").textContent = "A little corner for you, Kanha 💙";
+  $("chatSubtitle").textContent = "Our conversation";
+  addMessage(text, "user");
+  input.value = "";
+  $("typing").classList.add("show");
+
+  setTimeout(() => {
+    $("typing").classList.remove("show");
+    addMessage(replyTo(text), "bot");
+  }, 450);
+}
+
+$("chatForm").addEventListener("submit", event => {
+  event.preventDefault();
+  sendMessage(input.value);
+});
+
+$("newChat").addEventListener("click", () => {
+  messages = [];
+  chat.replaceChildren();
+  $("chatTitle").textContent = "A little corner for you, Kanha 💙";
+  $("chatSubtitle").textContent = "What's on your mind today?";
+  welcome();
+  showToast("A fresh chat is ready, Kanha.");
+  input.focus();
+});
+
+document.querySelectorAll("[data-page]").forEach(button => {
+  button.addEventListener("click", () => {
+    const page = button.dataset.page;
+    document.querySelectorAll(".nav-button").forEach(b =>
+      b.classList.toggle("active", b.dataset.page === page)
+    );
+
+    if (page === "Chat") {
+      $("chatTitle").textContent = "A little corner for you, Kanha 💙";
+      $("chatSubtitle").textContent = "What's on your mind today?";
+      input.focus();
+    } else if (page === "Voice Chat") {
+      showToast("Tap the microphone to try voice input.");
+    } else if (page === "Memory") {
+      showToast("Chat history is saved locally on this device when available.");
+    } else if (page === "Settings") {
+      showToast("Settings: theme toggle is available at the top.");
+    } else if (page === "Explore") {
+      showToast("Explore ideas by sending a message to RADHA.");
+    }
+  });
+});
+
+$("voiceButton").addEventListener("click", () => {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    showToast("Voice input isn't supported in this browser. Try Chrome.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-IN";
+  recognition.interimResults = false;
+
+  recognition.onstart = () => showToast("Listening, Kanha...");
+  recognition.onresult = event => {
+    input.value = event.results[0][0].transcript;
+    input.focus();
+  };
+  recognition.onerror = () => showToast("Couldn't hear that. Please try again.");
+  recognition.start();
+});
+
+$("attachButton").addEventListener("click", () => {
+  showToast("Attachments will be added in a future update.");
+});
+
+$("themeButton").addEventListener("click", () => {
+  document.body.classList.toggle("brighter");
+  const brighter = document.body.classList.contains("brighter");
+  document.body.style.filter = brighter ? "brightness(1.17)" : "";
+  $("themeButton").textContent = brighter ? "☀" : "☾";
+});
+
+function createStars() {
+  const container = $("stars");
+  for (let i = 0; i < 85; i++) {
+    const star = document.createElement("i");
+    star.className = "star";
+    star.style.left = Math.random() * 100 + "%";
+    star.style.top = Math.random() * 100 + "%";
+    star.style.opacity = (0.25 + Math.random() * 0.75).toFixed(2);
+    const size = 1 + Math.random() * 2;
+    star.style.width = size + "px";
+    star.style.height = size + "px";
+    container.appendChild(star);
+  }
+}
+
+function loadChat() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    if (Array.isArray(stored) && stored.length) {
+      messages = stored;
+      messages.forEach(m => {
+        const row = document.createElement("div");
+        row.className = "message-row " + (m.role === "user" ? "user" : "bot");
+        const sender = document.createElement("div");
+        sender.className = "sender";
+        sender.textContent = m.role === "user" ? "Kanha" : "RADHA";
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = m.text;
+        
